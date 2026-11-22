@@ -342,6 +342,10 @@ h2{font-size:clamp(22px,5.4vmin,46px);text-shadow:0 3px 0 #e0559f,0 6px 0 #9b5cf
 .walking .bhop{animation:bhop .3s ease-in-out infinite alternate}
 @keyframes bhop{to{transform:translateY(-8px)}}
 
+.pax{position:absolute;left:50%;bottom:96%;transform:translateX(-50%);display:flex;gap:2px;background:#fff;border-radius:999px;padding:2px 6px;
+  box-shadow:0 2px 0 #ff9fd2;pointer-events:none;white-space:nowrap}
+.cobj .pax svg{width:clamp(16px,2.8vmin,26px);height:clamp(16px,2.8vmin,26px)}
+
 @media (orientation:portrait){
   .avatars{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr))}
   .kennels{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,minmax(0,1fr))}
@@ -1924,7 +1928,7 @@ function placeItem(id){
 $('bagBtn').addEventListener('click',()=>{ pop(); openBag(); });
 $('sheet2').addEventListener('click',e=>{
   if(e.target.id==='sheet2' || e.target.closest('[data-close]')){ pop(); closeSheet(); return; }
-  const sb=e.target.closest('.shopBtn'); if(sb){ closeSheet(); pop(); goShop(sb.dataset.shop); return; }
+  const sb=e.target.closest('.shopBtn[data-shop]'); if(sb){ closeSheet(); pop(); goShop(sb.dataset.shop); return; }
   const by=e.target.closest('[data-buy]'); if(by){ buy(by.dataset.buy); return; }
   const dd=e.target.closest('[data-dest]'); if(dd){ closeSheet(); startRide(dd.dataset.mode,dd.dataset.dest); return; }
   const b=e.target.closest('.bcard'); if(!b) return;
@@ -2225,7 +2229,7 @@ function nearestPlace(){
 function openDest(mode){
   if(CT.busy && !(mode==='taxi' && CT.busy==='taxiWait')) return;
   const here = mode==='taxi' ? null : nearestPlace();
-  const btns=Object.keys(PLACES).filter(k=>k!==here).map(k=>`<button class="shopBtn" data-dest="${k}" data-mode="${mode}">${PLACES[k].svg()}<div class="lbl">${PLACES[k].label()}</div></button>`).join('');
+  const btns=Object.keys(PLACES).filter(k=>k!==here).map(k=>`<button class="shopBtn destBtn" data-dest="${k}" data-mode="${mode}">${PLACES[k].svg()}<div class="lbl">${PLACES[k].label()}</div></button>`).join('');
   openSheet(`<div class="bagHead" style="font-size:clamp(18px,3.8vmin,32px)"><span style="width:3.2em;display:inline-block">${VEH[mode].svg()}</span><span>${t('whereTo')}</span></div>`+
     (mode==='taxi'?`<div class="mq small"><span class="spr">${COIN}${fmtMoney(TAXI_PRICE)}</span></div>`:'<div class="mq small"></div>')+
     `<div class="destGrid">${btns}</div><div class="row" style="margin-top:2vmin"><button class="pill ghost" data-close>${t('back')}</button></div>`);
@@ -2250,22 +2254,53 @@ function walkInto(id){
 function vehLeave(v,from){
   later(()=>follow(v,route(from,atNode(nearestSpawn(from),'veh'),'veh'),v.speed,()=>{ v.el.remove(); CT.vehs=CT.vehs.filter(x=>x!==v); }),700);
 }
+// Weg am Ende kürzen: das Fahrzeug hält ein paar Schritte vor der Figur
+function trimEnd(path,len){
+  let rest=len;
+  for(let i=path.length-1;i>0;i--){
+    const a=path[i-1], b=path[i], d=dst(a,b);
+    if(d>rest){ const f=rest/d; return [...path.slice(0,i), {x:b.x+(a.x-b.x)*f, y:b.y+(a.y-b.y)*f}]; }
+    rest-=d;
+  }
+  return [path[0]];
+}
+// kleine Köpfe von Figur und Tier, die im Fahrzeug mitfahren
+function paxHtml(){
+  const head=person(AVATARS[state.avatar].o).replace('<svg viewBox="0 0 200 260">','<svg viewBox="40 16 120 120" style="overflow:hidden">');
+  let pet='';
+  if(CT.pet){
+    if(state.pet.type==='dog'){
+      const o=DOGS[state.pet.i].o, len=o.len||50, leg=o.leg||30, ry=o.ry||26, hx=124-len+4, hy=158-leg-ry-34;
+      pet=petSvg(state.pet,state.wear).replace('<svg viewBox="0 0 220 170">',`<svg viewBox="${hx-44} ${hy-58} 88 96" style="overflow:hidden">`);
+    }else pet=petSvg(state.pet,state.wear).replace('<svg viewBox="0 0 200 160">','<svg viewBox="28 20 76 76" style="overflow:hidden">');
+  }
+  return `<div class="pax">${head}${pet}</div>`;
+}
 // einsteigen, zum Ziel fahren, vor der Tür aussteigen und hineingehen
-function rideTo(v,pick,dest,V,key){
-  horn(); CT.busy='ride';
-  CT.av.el.classList.add('hide'); if(CT.pet) CT.pet.el.classList.add('hide');
-  setCityHint(t('ride'+key));
-  const D=PLACES[dest], T=project(D.node[0],D.node[1],'veh');
-  later(()=>follow(v,route(pick,T,'veh'),V.speed,()=>{
-    horn();
-    CT.av.x=T.x; CT.av.y=T.y; CT.trail=[{x:T.x-6,y:T.y},{x:T.x,y:T.y}];
-    if(CT.pet){ CT.pet.x=T.x-5.5; CT.pet.y=T.y; CT.pet.el.classList.remove('hide'); }
-    CT.av.el.classList.remove('hide');
-    state.lastPlace=dest; save(); setCityHint(t('arrived')); chime();
-    vehLeave(v,T);
-    CT.busy='enter';
-    later(()=>walkInto(dest),450);
-  }),600);
+function rideTo(v,dest,V,key){
+  CT.busy='board';
+  const a=CT.av;
+  follow(a,[{x:a.x,y:a.y},{x:v.x,y:v.y}],12,()=>{
+    a.el.classList.add('hide'); pop();
+    later(()=>{
+      if(CT.pet) CT.pet.el.classList.add('hide');
+      v.el.insertAdjacentHTML('beforeend',paxHtml());
+      horn(); CT.busy='ride';
+      setCityHint(t('ride'+key));
+      const from=project(v.x,v.y,'veh'), D=PLACES[dest], T=project(D.node[0],D.node[1],'veh');
+      later(()=>follow(v,route(from,T,'veh'),V.speed,()=>{
+        horn();
+        const px=v.el.querySelector('.pax'); if(px) px.remove();
+        CT.av.x=T.x; CT.av.y=T.y; CT.trail=[{x:T.x-6,y:T.y},{x:T.x,y:T.y}];
+        if(CT.pet){ CT.pet.x=T.x-5.5; CT.pet.y=T.y; CT.pet.el.classList.remove('hide'); }
+        CT.av.el.classList.remove('hide');
+        state.lastPlace=dest; save(); setCityHint(t('arrived')); chime();
+        vehLeave(v,T);
+        CT.busy='enter';
+        later(()=>walkInto(dest),450);
+      }),400);
+    },380);
+  });
 }
 // Taxi rufen: es kommt sofort zur Figur, dann wählt man das Ziel
 function callTaxi(){
@@ -2275,7 +2310,7 @@ function callTaxi(){
   const pick=project(CT.av.x,CT.av.y,'veh');
   if(dst(CT.av,pick)>1) cityWalkTo(pick.x,pick.y); else { CT.av.path=null; CT.av.el.classList.remove('walking'); }
   setCityHint(t('taxiComing'));
-  const full=route(atNode(nearestSpawn(pick),'veh'),pick,'veh'), path=tailPath(full,30);
+  const full=route(atNode(nearestSpawn(pick),'veh'),pick,'veh'), path=trimEnd(tailPath(full,36),7);
   const v=cEnt(taxiSvg(),VEH.taxi.w,'veh'); v.zb=5; v.x=path[0].x; v.y=path[0].y; CT.vehs.push(v); cPos(v);
   follow(v,path,VEH.taxi.speed,()=>{
     horn(); CT.taxi=v; CT.pick=pick;
@@ -2294,7 +2329,7 @@ function startRide(mode,dest){
     if(state.money<TAXI_PRICE){ toast(t('noTaxi')); nope(); taxiCancel(); return; }
     state.money-=TAXI_PRICE; save(); renderMoney(true); coinSnd();
     const v=CT.taxi; CT.taxi=null;
-    rideTo(v,CT.pick,dest,VEH.taxi,'Taxi');
+    rideTo(v,dest,VEH.taxi,'Taxi');
     return;
   }
   if(CT.busy) return;
@@ -2305,7 +2340,7 @@ function startRide(mode,dest){
   later(()=>{
     const v=cEnt(V.svg(),V.w,'veh'); v.zb=5; CT.vehs.push(v);
     const A=atNode(nearestSpawn(pick),'veh'); v.x=A.x; v.y=A.y; cPos(v);
-    follow(v,route(A,pick,'veh'),V.speed,()=>rideTo(v,pick,dest,V,key));
+    follow(v,trimEnd(route(A,pick,'veh'),mode==='tram'?11:9),V.speed,()=>rideTo(v,dest,V,key));
   },V.wait);
 }
 const PAW_BTN = `<svg viewBox="-16 -16 32 32">${PAW(0,0,1,'#ff7ac0')}</svg>`;
