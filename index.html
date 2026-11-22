@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ff7ac0">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -493,7 +495,7 @@ const T = {
       cityHint:'Нажми на улицу или на дом!',whereTo:'Куда поедем?',waitBus:'Автобус скоро приедет…',waitTram:'Трамвай скоро приедет…',
       rideBus:'Ты едешь на автобусе — бесплатно!',rideTram:'Ты едешь на трамвае — бесплатно!',rideTaxi:'Такси едет очень быстро!',
       noTaxi:'Ой, на такси не хватает денег. Поезжай на автобусе или трамвае — это бесплатно!',
-      arrived:'Приехали! Нажми на дом, чтобы войти.',needPet:'Сначала возьми питомца из приюта!',
+      arrived:'Приехали!',taxiComing:'Такси уже едет к тебе!',needPet:'Сначала возьми питомца из приюта!',
       petWith:'{name} идёт с тобой!',petHome:'{name} остаётся дома.',dom:'Эрфуртский собор — динь-дон!',bridge:'Мост Кремербрюкке — мост с домиками!',
       vet:'Ветеринар',park:'Парк',sick:'{name} плохо себя чувствует! Сходи с питомцем к ветеринару в городе.',sickHint:'Сначала к ветеринару!',
       vetTreat:'Лечить',vetHealthy:'Питомец здоров! Приходи снова, если он заболеет.',vetSick:'Ой, {name} болеет. Ветеринар поможет!',
@@ -522,7 +524,7 @@ const T = {
       cityHint:'Atinge strada sau o casă!',whereTo:'Unde vrei să mergi?',waitBus:'Autobuzul vine imediat…',waitTram:'Tramvaiul vine imediat…',
       rideBus:'Mergi cu autobuzul – gratis!',rideTram:'Mergi cu tramvaiul – gratis!',rideTaxi:'Taxiul merge foarte repede!',
       noTaxi:'Oh, nu ai destui bani pentru taxi. Ia autobuzul sau tramvaiul – sunt gratis!',
-      arrived:'Am ajuns! Atinge casa ca să intri.',needPet:'Mai întâi ia un animăluț de la adăpost!',
+      arrived:'Am ajuns!',taxiComing:'Taxiul vine la tine!',needPet:'Mai întâi ia un animăluț de la adăpost!',
       petWith:'{name} vine cu tine!',petHome:'{name} rămâne acasă.',dom:'Domul din Erfurt – ding dong!',bridge:'Podul Krämerbrücke – un pod cu căsuțe!',
       vet:'Veterinar',park:'Parc',sick:'{name} nu se simte bine! Mergi cu {name} la veterinar în oraș.',sickHint:'Mai întâi la veterinar!',
       vetTreat:'Tratează',vetHealthy:'Animăluțul e sănătos! Revino dacă se îmbolnăvește.',vetSick:'Oh, {name} nu se simte bine. Veterinarul ajută!',
@@ -551,7 +553,7 @@ const T = {
       cityHint:'Tippe auf die Straße oder auf ein Haus!',whereTo:'Wohin möchtest du fahren?',waitBus:'Der Bus kommt gleich…',waitTram:'Die Straßenbahn kommt gleich…',
       rideBus:'Du fährst Bus – kostenlos!',rideTram:'Du fährst Straßenbahn – kostenlos!',rideTaxi:'Das Taxi fährt ganz schnell!',
       noTaxi:'Oh, für das Taxi reicht dein Geld nicht. Nimm doch den Bus oder die Straßenbahn – die sind kostenlos!',
-      arrived:'Angekommen! Tippe auf das Haus, um hineinzugehen.',needPet:'Hol dir zuerst ein Tier aus dem Hundeheim oder Katzenheim!',
+      arrived:'Angekommen!',taxiComing:'Das Taxi kommt zu dir!',needPet:'Hol dir zuerst ein Tier aus dem Hundeheim oder Katzenheim!',
       petWith:'{name} kommt mit!',petHome:'{name} bleibt zu Hause.',dom:'Der Erfurter Dom – ding dong!',bridge:'Die Krämerbrücke – eine Brücke mit Häusern!',
       vet:'Tierarzt',park:'Park',sick:'{name} fühlt sich nicht gut! Geh mit {name} zum Tierarzt in der Stadt.',sickHint:'Erst zum Tierarzt!',
       vetTreat:'Behandeln',vetHealthy:'Dein Tier ist gesund! Komm wieder, wenn es krank ist.',vetSick:'Oh, {name} ist krank. Der Tierarzt hilft!',
@@ -1812,7 +1814,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); }
 let toastT=0;
 function toast(msg){ const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3000); }
 function openSheet(html){ $('sheet2In').innerHTML=html; $('sheet2').classList.add('show'); }
-function closeSheet(){ $('sheet2').classList.remove('show'); }
+function closeSheet(){ $('sheet2').classList.remove('show'); setTimeout(()=>{ if(typeof CT!=='undefined' && CT.busy==='taxiWait' && !$('sheet2').classList.contains('show')) taxiCancel(); },0); }
 function kaching(){ if(!ac()) return; const t=AC.currentTime+.01; tone(1319,t,.08,'square',.06); tone(1760,t+.08,.12,'square',.06); tone(2637,t+.2,.4,'triangle',.14); }
 
 /* ----- дверь: выбор магазина ----- */
@@ -2064,7 +2066,7 @@ function citySvg(){
 }
 
 /* --- Figuren in der Stadt --- */
-const CT={W:1,H:1,raf:0,last:0,av:null,pet:null,npcs:[],cars:[],vehs:[],busy:null,trail:[]};
+const CT={W:1,H:1,raf:0,last:0,av:null,pet:null,npcs:[],cars:[],vehs:[],busy:null,trail:[],taxi:null,pick:null};
 function cEnt(html,w,cls){
   const el=document.createElement('div'); el.className='cobj '+(cls||''); el.style.width=(w/1.8)+'%';
   el.innerHTML=`<div class="flip">${html}</div>`; $('city').appendChild(el);
@@ -2138,7 +2140,7 @@ function goCity(from){
   setCityHint(t('cityHint'));
   CT.last=performance.now(); cancelAnimationFrame(CT.raf); CT.raf=requestAnimationFrame(cityLoop);
 }
-function stopCity(){ cancelAnimationFrame(CT.raf); CT.raf=0; CT.busy=null; save(); }
+function stopCity(){ cancelAnimationFrame(CT.raf); CT.raf=0; CT.busy=null; CT.taxi=null; save(); }
 function trailPoint(back){
   let p={x:CT.av.x,y:CT.av.y};
   for(let i=CT.trail.length-1;i>=0;i--){
@@ -2186,7 +2188,7 @@ $('city').addEventListener('pointerdown',e=>{
   if(current!=='s-city' || CT.busy) return;
   ac();
   const b=e.target.closest('[data-place]'), st=e.target.closest('[data-stop]'), hit=e.target.closest('[data-hit]');
-  if(b){ const p=PLACES[b.dataset.place]; pop(); cityWalkTo(p.node[0],p.node[1],()=>enterPlace(b.dataset.place)); return; }
+  if(b){ const p=PLACES[b.dataset.place]; pop(); cityWalkTo(p.node[0],p.node[1],()=>walkInto(b.dataset.place)); return; }
   if(st){ const s=STOPS[+st.dataset.stop]; pop(); cityWalkTo(s.x,s.y,()=>openDest(s.type)); return; }
   if(hit){ if(hit.dataset.hit==='dom'){ bells(); toast(t('dom')); } else { chime(); toast(t('bridge')); } }
   const r=$('city').getBoundingClientRect();
@@ -2198,41 +2200,89 @@ function nearestPlace(){
   return best;
 }
 function openDest(mode){
-  if(CT.busy) return;
-  const here=nearestPlace();
+  if(CT.busy && !(mode==='taxi' && CT.busy==='taxiWait')) return;
+  const here = mode==='taxi' ? null : nearestPlace();
   const btns=Object.keys(PLACES).filter(k=>k!==here).map(k=>`<button class="shopBtn" data-dest="${k}" data-mode="${mode}">${PLACES[k].svg()}<div class="lbl">${PLACES[k].label()}</div></button>`).join('');
   openSheet(`<div class="bagHead" style="font-size:clamp(18px,3.8vmin,32px)"><span style="width:3.2em;display:inline-block">${VEH[mode].svg()}</span><span>${t('whereTo')}</span></div>`+
     (mode==='taxi'?`<div class="mq small"><span class="spr">${COIN}${fmtMoney(TAXI_PRICE)}</span></div>`:'<div class="mq small"></div>')+
     `<div class="destGrid">${btns}</div><div class="row" style="margin-top:2vmin"><button class="pill ghost" data-close>${t('back')}</button></div>`);
 }
 function nearestSpawn(p){ let sp=SPAWNS[0],bd=1e9; for(const s of SPAWNS){ const d=dst(CN[s],p); if(d<bd){ bd=d; sp=s; } } return sp; }
-function startRide(mode,dest){
-  if(current!=='s-city' || CT.busy) return;
-  if(mode==='taxi'){
-    if(state.money<TAXI_PRICE){ toast(t('noTaxi')); nope(); return; }
-    state.money-=TAXI_PRICE; save(); renderMoney(true); coinSnd();
+// nur das letzte Stück eines Weges (damit das Taxi sofort da ist)
+function tailPath(path,len){
+  let rest=len;
+  for(let i=path.length-1;i>0;i--){
+    const a=path[i-1], b=path[i], d=dst(a,b);
+    if(d>=rest){ const f=rest/d; return [{x:b.x+(a.x-b.x)*f, y:b.y+(a.y-b.y)*f}, ...path.slice(i)]; }
+    rest-=d;
   }
-  const V=VEH[mode], key=mode==='bus'?'Bus':mode==='tram'?'Tram':'Taxi';
+  return path;
+}
+// Tür eines Hauses: vom Gehweg ein paar Schritte bis zur Tür
+function doorOf(id){ const P=PLACES[id]; return P.base<P.node[1] ? {x:P.x,y:P.base} : {x:P.x,y:P.node[1]+3}; }
+function walkInto(id){
+  CT.busy='enter';
+  follow(CT.av,[{x:CT.av.x,y:CT.av.y},doorOf(id)],10,()=>{ CT.busy=null; enterPlace(id); });
+}
+function vehLeave(v,from){
+  later(()=>follow(v,route(from,atNode(nearestSpawn(from),'veh'),'veh'),v.speed,()=>{ v.el.remove(); CT.vehs=CT.vehs.filter(x=>x!==v); }),700);
+}
+// einsteigen, zum Ziel fahren, vor der Tür aussteigen und hineingehen
+function rideTo(v,pick,dest,V,key){
+  horn(); CT.busy='ride';
+  CT.av.el.classList.add('hide'); if(CT.pet) CT.pet.el.classList.add('hide');
+  setCityHint(t('ride'+key));
+  const D=PLACES[dest], T=project(D.node[0],D.node[1],'veh');
+  later(()=>follow(v,route(pick,T,'veh'),V.speed,()=>{
+    horn();
+    CT.av.x=T.x; CT.av.y=T.y; CT.trail=[{x:T.x-6,y:T.y},{x:T.x,y:T.y}];
+    if(CT.pet){ CT.pet.x=T.x-5.5; CT.pet.y=T.y; CT.pet.el.classList.remove('hide'); }
+    CT.av.el.classList.remove('hide');
+    state.lastPlace=dest; save(); setCityHint(t('arrived')); chime();
+    vehLeave(v,T);
+    CT.busy='enter';
+    later(()=>walkInto(dest),450);
+  }),600);
+}
+// Taxi rufen: es kommt sofort zur Figur, dann wählt man das Ziel
+function callTaxi(){
+  if(current!=='s-city' || CT.busy) return;
+  if(state.money<TAXI_PRICE){ toast(t('noTaxi')); nope(); return; }
+  CT.busy='wait';
+  const pick=project(CT.av.x,CT.av.y,'veh');
+  if(dst(CT.av,pick)>1) cityWalkTo(pick.x,pick.y); else { CT.av.path=null; CT.av.el.classList.remove('walking'); }
+  setCityHint(t('taxiComing'));
+  const full=route(atNode(nearestSpawn(pick),'veh'),pick,'veh'), path=tailPath(full,30);
+  const v=cEnt(taxiSvg(),VEH.taxi.w,'veh'); v.zb=5; v.x=path[0].x; v.y=path[0].y; CT.vehs.push(v); cPos(v);
+  follow(v,path,VEH.taxi.speed,()=>{
+    horn(); CT.taxi=v; CT.pick=pick;
+    const ready=()=>{ if(current!=='s-city') return; if(CT.av.path){ later(ready,120); return; } CT.busy='taxiWait'; openDest('taxi'); };
+    ready();
+  });
+}
+function taxiCancel(){
+  if(CT.busy!=='taxiWait' || !CT.taxi) return;
+  const v=CT.taxi; CT.taxi=null; CT.busy=null; vehLeave(v,CT.pick); setCityHint(t('cityHint'));
+}
+function startRide(mode,dest){
+  if(current!=='s-city') return;
+  if(mode==='taxi'){
+    if(CT.busy!=='taxiWait' || !CT.taxi) return;
+    if(state.money<TAXI_PRICE){ toast(t('noTaxi')); nope(); taxiCancel(); return; }
+    state.money-=TAXI_PRICE; save(); renderMoney(true); coinSnd();
+    const v=CT.taxi; CT.taxi=null;
+    rideTo(v,CT.pick,dest,VEH.taxi,'Taxi');
+    return;
+  }
+  if(CT.busy) return;
+  const V=VEH[mode], key=mode==='bus'?'Bus':'Tram';
   CT.busy='wait'; CT.av.path=null; CT.av.el.classList.remove('walking');
-  setCityHint(t(mode==='taxi'?'rideTaxi':'wait'+key));
+  setCityHint(t('wait'+key));
   const pick=project(CT.av.x,CT.av.y,'veh');
   later(()=>{
     const v=cEnt(V.svg(),V.w,'veh'); v.zb=5; CT.vehs.push(v);
     const A=atNode(nearestSpawn(pick),'veh'); v.x=A.x; v.y=A.y; cPos(v);
-    follow(v,route(A,pick,'veh'),V.speed,()=>{
-      horn(); CT.busy='ride';
-      CT.av.el.classList.add('hide'); if(CT.pet) CT.pet.el.classList.add('hide');
-      setCityHint(t('ride'+key));
-      const D=PLACES[dest], T=project(D.node[0],D.node[1],'veh');
-      later(()=>follow(v,route(pick,T,'veh'),V.speed,()=>{
-        horn();
-        CT.av.x=T.x; CT.av.y=T.y; CT.trail=[{x:T.x-6,y:T.y},{x:T.x,y:T.y}];
-        if(CT.pet){ CT.pet.x=T.x-5.5; CT.pet.y=T.y; CT.pet.el.classList.remove('hide'); }
-        CT.av.el.classList.remove('hide');
-        CT.busy=null; state.lastPlace=dest; save(); setCityHint(t('arrived')); chime();
-        later(()=>follow(v,route(T,atNode(nearestSpawn(T),'veh'),'veh'),V.speed,()=>{ v.el.remove(); CT.vehs=CT.vehs.filter(x=>x!==v); }),700);
-      }),700);
-    });
+    follow(v,route(A,pick,'veh'),V.speed,()=>rideTo(v,pick,dest,V,key));
   },V.wait);
 }
 const PAW_BTN = `<svg viewBox="-16 -16 32 32">${PAW(0,0,1,'#ff7ac0')}</svg>`;
@@ -2247,7 +2297,7 @@ $('petBtn').addEventListener('click',()=>{
   else { if(CT.pet) CT.pet.el.remove(); CT.pet=null; toast(tn('petHome')); }
 });
 $('taxiBtn').innerHTML=taxiSvg();
-$('taxiBtn').addEventListener('click',()=>{ if(CT.busy) return; pop(); openDest('taxi'); });
+$('taxiBtn').addEventListener('click',()=>{ if(CT.busy) return; pop(); callTaxi(); });
 $('cityBack').addEventListener('click',()=>{ if(CT.busy) return; pop(); document.querySelectorAll('.av').forEach(x=>x.classList.remove('picked')); show('s-avatar'); });
 window.addEventListener('resize',()=>{ if(current==='s-city') fitCity(); });
 
