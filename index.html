@@ -346,6 +346,15 @@ h2{font-size:clamp(22px,5.4vmin,46px);text-shadow:0 3px 0 #e0559f,0 6px 0 #9b5cf
   box-shadow:0 2px 0 #ff9fd2;pointer-events:none;white-space:nowrap}
 .cobj .pax svg{width:clamp(16px,2.8vmin,26px);height:clamp(16px,2.8vmin,26px)}
 
+/* ---------- Klo, Gassi, Straßenbahn ---------- */
+.potty .flip svg{transform:scaleY(.88) translateY(6%);transform-origin:50% 100%}
+.shovelHint{animation:bob 1s ease-in-out infinite}
+.leashLayer{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1400;pointer-events:none}
+.cspot .bagHint,.pspot .bagHint{position:absolute;left:50%;bottom:90%;width:120%;transform:translateX(-50%);animation:bob 1s ease-in-out infinite}
+.cspot svg,.pspot svg{height:auto}
+.cspot.cleaned svg{animation:pop .4s ease reverse}
+.ctram.ready .flip svg{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px #ffd84d);animation:bob .8s ease-in-out infinite}
+
 @media (orientation:portrait){
   .avatars{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr))}
   .kennels{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,minmax(0,1fr))}
@@ -430,7 +439,8 @@ h2{font-size:clamp(22px,5.4vmin,46px);text-shadow:0 3px 0 #e0559f,0 6px 0 #9b5cf
   <div class="top"><button class="rbtn" id="homeBack"></button><h2 id="homeName"></h2><div class="hearts" id="hearts"></div><div class="money" id="money"></div>
     <button class="rbtn bagBtn" id="bagBtn" aria-label="bag"></button>
     <button class="rbtn camBtn" data-cam="home" aria-label="camera"></button><button class="rbtn albumBtn" data-from="home" aria-label="album"></button>
-    <button class="rbtn gameBtn" data-from="home" aria-label="game"></button></div>
+    <button class="rbtn gameBtn" data-from="home" aria-label="game"></button>
+    <button class="rbtn" id="leashBtn" aria-label="leash"></button></div>
   <div class="houseWrap" id="houseWrap"><div class="house" id="house"></div></div>
 </section>
 
@@ -523,7 +533,11 @@ const T = {
       album:'Фотоальбом',albumEmpty:'Пока нет фото. Нажми на фотоаппарат!',photoSaved:'Щёлк! Фото в альбоме.',
       albumFull:'Альбом полон. Удали старое фото.',del:'Удалить',evening:'Наступает вечер — зажигаются фонари!',
       night:'Ночь. {name} хочет спать…',morning:'Доброе утро! Встаёт солнце.',goodNight:'Спокойной ночи, {name}!',
-      parrotHi:'Привет! Привет!',courseHint:'Нажми на препятствие — питомец пройдёт полосу!',jumpGood:'Оп! Отличный прыжок!',
+      parrotHi:'Привет! Привет!',
+      wish_potty:'{name} хочет в туалет!',pottyDone:'Готово! Теперь убери совочком ✨',cleanDone:'Чистота! ✨',
+      cleanPlease:'Пожалуйста, убери — нажми туда!',quick:'Быстрая помощь! Дополнительные монетки!',walkGo:'Прогулка! {name} идёт на поводке.',
+      pottyOut:'Остановка у дерева! Нажми на пятнышко и убери пакетиком!',bagDone:'Убрано пакетиком — супер!',
+      tramWait:'Подожди трамвай и нажми на него, когда он остановится!',tramNotNow:'Трамвай сейчас здесь не стоит.',goToStop:'Сначала подойди к остановке!',courseHint:'Нажми на препятствие — питомец пройдёт полосу!',jumpGood:'Оп! Отличный прыжок!',
       tunnelGood:'Через туннель — ура!',slalomGood:'Слалом пройден!',rampGood:'Вверх и вниз — здорово!',
       courseProg:'Пройдено {d} из 4!',courseDone:'Вся полоса пройдена! +{m} и сердечки!',
       names:['Мими','Бусинка','Джуни','Луна','Пончик','Кими','Соби','Тото','Звёздочка','Боба']},
@@ -555,7 +569,11 @@ const T = {
       album:'Album foto',albumEmpty:'Încă nu ai poze. Atinge aparatul foto!',photoSaved:'Clic! Poza e în album.',
       albumFull:'Albumul e plin. Șterge o poză veche.',del:'Șterge',evening:'Se lasă seara – se aprind felinarele!',
       night:'E noapte. {name} vrea să doarmă…',morning:'Bună dimineața! Răsare soarele.',goodNight:'Noapte bună, {name}!',
-      parrotHi:'Salut! Salut!',courseHint:'Atinge un obstacol – animăluțul face traseul!',jumpGood:'Hop! Ce săritură!',
+      parrotHi:'Salut! Salut!',
+      wish_potty:'{name} trebuie la toaletă!',pottyDone:'Gata! Acum curăță cu lopățica ✨',cleanDone:'Curat lună! ✨',
+      cleanPlease:'Te rog curăță – atinge acolo!',quick:'Ajutor rapid! Monede în plus!',walkGo:'La plimbare! {name} vine în lesă.',
+      pottyOut:'Pauză la copac! Atinge pata și curăță cu punguța!',bagDone:'Curățat cu punguța – super!',
+      tramWait:'Așteaptă tramvaiul și atinge-l când oprește!',tramNotNow:'Tramvaiul nu oprește aici acum.',goToStop:'Mergi mai întâi la stație!',courseHint:'Atinge un obstacol – animăluțul face traseul!',jumpGood:'Hop! Ce săritură!',
       tunnelGood:'Prin tunel – ura!',slalomGood:'Slalom reușit!',rampGood:'Sus și jos – grozav!',
       courseProg:'{d} din 4 reușite!',courseDone:'Tot traseul e gata! +{m} și inimioare!',
       names:['Mimi','Bubu','Juni','Luna','Gogoașă','Kimi','Sobi','Toto','Steluța','Boba']},
@@ -587,7 +605,11 @@ const T = {
       album:'Fotoalbum',albumEmpty:'Noch keine Fotos. Tippe auf die Kamera!',photoSaved:'Klick! Das Foto ist im Album.',
       albumFull:'Das Album ist voll. Lösch ein altes Foto.',del:'Löschen',evening:'Es wird Abend – die Laternen gehen an!',
       night:'Es ist Nacht. {name} wird müde…',morning:'Guten Morgen! Die Sonne geht auf.',goodNight:'Gute Nacht, {name}! Schlaf schön.',
-      parrotHi:'Hallo! Hallo!',courseHint:'Tippe auf ein Hindernis – dein Tier macht den Parcours!',jumpGood:'Hopp! Super gesprungen!',
+      parrotHi:'Hallo! Hallo!',
+      wish_potty:'{name} muss aufs Klo!',pottyDone:'Fertig! Jetzt mit der Schaufel sauber machen ✨',cleanDone:'Blitzsauber! ✨',
+      cleanPlease:'Bitte sauber machen – tippe darauf!',quick:'Schnell geholfen! Extra Münzen!',walkGo:'Gassi gehen! {name} kommt an der Leine mit.',
+      pottyOut:'{name} war am Baum. Tippe auf den Fleck und mach mit dem Beutel sauber!',bagDone:'Mit dem Beutel sauber gemacht – super!',
+      tramWait:'Warte auf die Straßenbahn und tippe auf sie, wenn sie hält!',tramNotNow:'Die Bahn hält hier gerade nicht.',goToStop:'Geh zuerst zur Haltestelle!',courseHint:'Tippe auf ein Hindernis – dein Tier macht den Parcours!',jumpGood:'Hopp! Super gesprungen!',
       tunnelGood:'Durch den Tunnel – juhu!',slalomGood:'Slalom geschafft!',rampGood:'Rauf und runter – toll!',
       courseProg:'{d} von 4 geschafft!',courseDone:'Ganzer Parcours geschafft! +{m} und Herzen!',
       names:['Mimi','Bubu','Juni','Luna','Keks','Kimi','Sobi','Toto','Sternchen','Boba']}
@@ -953,14 +975,14 @@ function wishSnd(){ if(!ac()) return; const t=AC.currentTime+.01; sweep(700,1000
    ===================================================================== */
 const $ = id => document.getElementById(id);
 const state = {avatar:0, pet:null, name:'', money:10000, happy:60,
-  cons:{food:0,water:0,treat:0,shampoo:0}, items:null, clothes:[], wear:{head:null,eyes:null,body:null,neck:null}, nextU:10, lastPlace:'home', petCity:true, sick:false, cares:0, clock:.1, photos:[]};
+  cons:{food:0,water:0,treat:0,shampoo:0}, items:null, clothes:[], wear:{head:null,eyes:null,body:null,neck:null}, nextU:10, lastPlace:'home', petCity:true, sick:false, cares:0, clock:.1, photos:[], dirty:false, walk:false};
 let current='s-title', timers=[];
 function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
 const tn = k => t(k).replace(/\{name\}/g, state.name);
 function save(){
   try{ localStorage.setItem('kpopPets', JSON.stringify({lang, avatar:state.avatar, pet:state.pet, name:state.name,
        money:state.money, happy:state.happy, lastSeen:Date.now(),
-       cons:state.cons, items:state.items, clothes:state.clothes, wear:state.wear, nextU:state.nextU, lastPlace:state.lastPlace, petCity:state.petCity, sick:state.sick, cares:state.cares, clock:state.clock, photos:state.photos, muted:muted})); }catch(e){}
+       cons:state.cons, items:state.items, clothes:state.clothes, wear:state.wear, nextU:state.nextU, lastPlace:state.lastPlace, petCity:state.petCity, sick:state.sick, cares:state.cares, clock:state.clock, photos:state.photos, muted:muted, dirty:state.dirty})); }catch(e){}
 }
 function load(){
   try{
@@ -989,6 +1011,7 @@ function load(){
     if(Number.isInteger(d.cares) && d.cares>=0) state.cares=d.cares;
     if(typeof d.clock==='number' && d.clock>=0 && d.clock<1) state.clock=d.clock;
     if(d.muted===true) muted=true;
+    if(d.dirty===true) state.dirty=true;
     if(Array.isArray(d.photos)) state.photos=d.photos.filter(ph=>ph && ph.p && ((ph.p.type==='dog'&&ph.p.i>=0&&ph.p.i<DOGS.length)||(ph.p.type==='cat'&&ph.p.i>=0&&ph.p.i<CATS.length))
         && typeof ph.n==='string' && typeof ph.ts==='number').slice(-40).map(ph=>({p:{type:ph.p.type,i:ph.p.i|0},
         w:Object.fromEntries(['head','eyes','body','neck'].map(k=>[k, ph.w && CATALOG[ph.w[k]] && CATALOG[ph.w[k]].slot===k ? ph.w[k] : null])),
@@ -1461,7 +1484,8 @@ const SPOTS = {
   drink:{pet:[.56,.11],  av:[.66,.07]},
   bath: {pet:[.84,.265], av:[.66,.06]},
   play: {pet:[.60,.08],  av:[.36,.08]},
-  sleep:{pet:[.155,.31], av:[.31,.05]}
+  sleep:{pet:[.155,.31], av:[.31,.05]},
+  potty:{pet:[.75,.035], av:[.62,.05]}
 };
 const HM = {av:null, pet:null, wish:null, lastWish:null, wishTimer:2, wishAge:0, wander:2, act:null, drag:false, raf:0, last:0, W:1, H:1, petT:0};
 
@@ -1494,7 +1518,7 @@ function buildHouse(){
   h.innerHTML=`<div class="floor"></div><div class="floor2"></div><div class="wl" style="left:30%"></div><div class="wl" style="left:68%"></div>`+
     itemHtml(14,58,12,SVG_WINDOW,null,null,1)+
     itemHtml(14,18,24,SVG_BED,'sleep')+itemHtml(63,30,7,SVG_DOOR,'door',null,3)+
-    itemHtml(28,5,7,SVG_TOY,'play')+
+    itemHtml(28,5,7,SVG_TOY,'play')+itemHtml(75,2,11,pottySvg(),'potty','pottyItem')+
     state.items.filter(i=>i.x!=null).map(placedHtml).join('')+
     `<div class="bagZone" id="bagZone">${BAG_SVG}</div>`+
     itemHtml(43.5,8,7,bowlSvg('food'),'food','bowlFood')+itemHtml(53.5,8,7,bowlSvg('drink'),'drink','bowlDrink')+
@@ -1516,6 +1540,8 @@ function goHome(){
   setHint(t('idle'));
   houseGlows(); applyDay();
   if(state.sick) showSick();
+  state.walk=false; HM.dirtyT=0;
+  $('leashBtn').style.display=state.pet.type==='dog'?'':'none';
   HM.last=performance.now(); cancelAnimationFrame(HM.raf); HM.raf=requestAnimationFrame(homeLoop);
   save();
 }
@@ -1573,6 +1599,10 @@ function homeLoop(now){
       if(HM.wander<=0){ HM.wander=3+Math.random()*3; const w=wanderTarget(); if(w) goTo(pet,w[0],w[1]); }
     }
   }
+  if(state.dirty && !HM.act){
+    HM.dirtyT=(HM.dirtyT||0)+dt;
+    if(HM.dirtyT>40){ HM.dirtyT=0; changeHappy(-3); setHint(t('cleanPlease')); }
+  }
   renderEnt(av); renderEnt(pet);
   HM.raf=requestAnimationFrame(homeLoop);
 }
@@ -1584,7 +1614,7 @@ function showSick(){
 function newWish(){
   if(!state.sick && state.cares>=3 && Math.random()<.12){ state.sick=true; save(); }
   if(state.sick){ showSick(); return; }
-  const kinds=['food','drink','bath','play','sleep'].filter(k=>k!==HM.lastWish);
+  const kinds=['food','drink','bath','play','sleep','potty'].filter(k=>k!==HM.lastWish);
   let k=kinds[Math.random()*kinds.length|0];
   if(darkness(state.clock)>.8 && Math.random()<.7) k='sleep';
   HM.wish=k; HM.lastWish=k; HM.wishAge=0; HM.pet.target=false;
@@ -1594,6 +1624,7 @@ function newWish(){
 function wiggle(el){ el.classList.remove('wig'); void el.offsetWidth; el.classList.add('wig'); }
 function useItem(kind,el){
   if(HM.act) return;
+  if(kind==='potty' && state.dirty){ cleanPotty(); return; }
   if(HM.wish==='sick'){ wiggle(el); nope(); setHint(t('sickHint')); return; }
   if(!HM.wish){ wiggle(el); pop(); setHint(tn('noWish')); return; }
   if(kind!==HM.wish){
@@ -1604,12 +1635,12 @@ function useItem(kind,el){
   startAct(kind,kind,0,spotFor(kind,el));
 }
 function startAct(kind,care,bonus,sp){
-  HM.act={kind, care, bonus, phase:'walk', t0:performance.now()};
+  HM.act={kind, care, bonus, phase:'walk', t0:performance.now(), age:HM.wishAge};
   HM.pet.wishEl.classList.remove('show');
   const face=(kind==='play'||kind==='treat') ? (sp.av[0]<sp.pet[0]?-1:1) : -1;
   goTo(HM.av,sp.av[0],sp.av[1]);
   goTo(HM.pet,sp.pet[0],sp.pet[1],face);
-  if(kind==='bath'||kind==='sleep') HM.pet.z=205;
+  if(kind==='bath'||kind==='sleep'||kind==='potty') HM.pet.z=205;
 }
 function spotFor(kind,el){
   const it=el&&el.dataset.u ? itemByU(+el.dataset.u) : null;
@@ -1666,6 +1697,10 @@ function startCare(){
     ball.animate(P,{duration:3000,easing:'linear'});
     [0,750,1500,2250,3000].forEach((ms,i)=>later(()=>{ boing(); if(i%2===1){ pet.el.classList.remove('hop'); void pet.el.offsetWidth; pet.el.classList.add('hop'); } },ms));
   }
+  if(k==='potty'){
+    dur=2200; pet.el.classList.add('potty'); tinkle();
+    for(let i=0;i<5;i++) later(()=>{ const [x,y]=petTop(); fx('',`<svg viewBox="0 0 20 20" style="width:18px"><path d="M10,0 Q11,9 20,10 Q11,11 10,20 Q9,11 0,10 Q9,9 10,0Z" fill="#c9a7ff"/></svg>`,x+(Math.random()-.5)*.08,y-.04,{'--dx':(Math.random()*30-15)+'px','--up':'50px'}); },300+i*300);
+  }
   if(k==='sleep'){
     dur=4600; $('night').classList.add('on'); pet.el.classList.add('sleeping'); lullaby();
     for(let i=0;i<7;i++) later(()=>{ const [x,y]=petTop(); fx('zz','Z',x+.02,y,{'--dx':(10+Math.random()*30)+'px','--up':'90px','--d':'2s'}); },300+i*600);
@@ -1674,20 +1709,23 @@ function startCare(){
 }
 function finishCare(){
   const k=HM.act.kind, pet=HM.pet;
-  pet.el.classList.remove('eating','sleeping','hop');
+  pet.el.classList.remove('eating','sleeping','hop','potty');
   $('foam').classList.remove('on'); $('night').classList.remove('on');
   if(k==='food'||k==='drink') later(()=>document.querySelectorAll('.eat').forEach(e=>e.classList.remove('eat')),1500);
   if(k==='bath'){ for(let i=0;i<6;i++) later(()=>{ const [x,y]=petTop(); fx('',`<svg viewBox="0 0 20 20" style="width:22px"><path d="M10,0 Q11,9 20,10 Q11,11 10,20 Q9,11 0,10 Q9,9 10,0Z" fill="#ffd84d"/></svg>`,x+(Math.random()-.5)*.1,y-.05,{'--dx':(Math.random()*40-20)+'px','--up':'60px'}); },i*120);
     later(()=>{ pet.z=null; goTo(pet,.73,.1); },700); }
   if(k==='sleep'){ pet.z=null; goTo(pet,clampX(pet.x+.07),Math.max(.03,Math.min(.26,pet.y-.05))); }
+  if(k==='potty'){ pet.z=null; goTo(pet,.6,.1); state.dirty=true; HM.dirtyT=0; setPottyItem(); }
   const [hx,hy]=petTop();
   for(let i=0;i<3;i++) later(()=>fx('',heartSvg(true).replace('<svg','<svg style="width:30px"'),hx+(i-1)*.025,hy,{'--dx':((i-1)*20)+'px','--up':'110px'}),i*180);
   const matched = HM.wish && HM.act.care===HM.wish;
   if(matched) state.cares++;
   changeHappy((matched?20:0)+HM.act.bonus);
   if(matched){
-    fx('plus','+25 €',hx+.06,hy-.04,{'--up':'70px','--d':'1.8s'});
-    giveMoney(25); setHint(tn(HM.act.care==='sleep' && darkness(state.clock)>.5 ? 'goodNight' : 'great'));
+    const quick = HM.act.care==='potty' && HM.act.age<10, pay=quick?35:25;
+    fx('plus','+'+pay+' €',hx+.06,hy-.04,{'--up':'70px','--d':'1.8s'});
+    giveMoney(pay);
+    setHint(HM.act.care==='potty' ? (quick?t('quick')+' ':'')+t('pottyDone') : tn(HM.act.care==='sleep' && darkness(state.clock)>.5 ? 'goodNight' : 'great'));
     HM.wish=null; HM.wishTimer=4+Math.random()*4;
   }else{
     setHint(t('yum'));
@@ -1782,7 +1820,7 @@ function dropItem(e){
   else { d.el.style.zIndex=itemZ(c,it.y); pop(); }
   save();
 }
-const SMALL_KINDS = ['food','drink','play','door'];
+const SMALL_KINDS = ['food','drink','play','door','potty'];
 function smallTapAt(e){
   if(!document.elementsFromPoint) return null;
   for(const el of document.elementsFromPoint(e.clientX,e.clientY)){
@@ -1803,7 +1841,7 @@ function movePet(e){
 }
 // Plätze, wo das Tier nicht einfach so stehen bleiben soll (vor Napf und Spielsachen)
 function petBlocked(x,y){
-  const zones=[[.435,.035,.08],[.535,.035,.08],[.28,.035,.05]];
+  const zones=[[.435,.035,.08],[.535,.035,.08],[.28,.035,.05],[.75,.055,.02]];
   for(const it of state.items) if(it.x!=null && CATALOG[it.id].kind) zones.push([it.x,CATALOG[it.id].w/200,it.y]);
   return zones.some(([zx,hw,zy]) => Math.abs(x-zx)<hw+.075 && y<zy+.07);
 }
@@ -1841,7 +1879,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); }
 let toastT=0;
 function toast(msg){ const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3000); }
 function openSheet(html){ $('sheet2In').innerHTML=html; $('sheet2').classList.add('show'); }
-function closeSheet(){ $('sheet2').classList.remove('show'); setTimeout(()=>{ if(typeof CT!=='undefined' && CT.busy==='taxiWait' && !$('sheet2').classList.contains('show')) taxiCancel(); },0); }
+function closeSheet(){ $('sheet2').classList.remove('show'); setTimeout(()=>{ if(typeof CT==='undefined' || $('sheet2').classList.contains('show')) return; if(CT.busy==='taxiWait') taxiCancel(); if(CT.busy==='tramWait') tramAlight(); },0); }
 function kaching(){ if(!ac()) return; const t=AC.currentTime+.01; tone(1319,t,.08,'square',.06); tone(1760,t+.08,.12,'square',.06); tone(2637,t+.2,.4,'triangle',.14); }
 
 /* ----- дверь: выбор магазина ----- */
@@ -1997,7 +2035,7 @@ const PLACES = {
   vet:  {x:101,base:84,w:17,node:[101,86],svg:()=>vetSvg(),         label:()=>t('vet')},
   park: {x:156,base:62,w:14,node:[156,48],svg:()=>parkSvg(),        label:()=>t('park')}
 };
-const STOPS = [{type:'bus',x:44,y:48},{type:'bus',x:164,y:48},{type:'tram',x:52,y:86},{type:'tram',x:168,y:86}];
+const STOPS = [{type:'bus',x:44,y:48},{type:'bus',x:164,y:48}];
 const TAXI_PRICE = 20;
 
 /* --- Fahrzeuge --- */
@@ -2018,16 +2056,17 @@ function busSvg(){
     <rect x="89" y="9" width="13" height="20" rx="2" fill="#e3f6ff"/><rect x="88" y="0" width="16" height="6" rx="2" fill="#ffd84d"/>${star(18,30.5,2.4,'#9b5cff')}${heart(60,31,.5,'#9b5cff')}
     ${wheels([22,86],38,6)}<circle cx="105" cy="30" r="2.4" fill="#fff6b0"/></svg>`;
 }
-function tramSvg(){
+function tramSvg(body,stripe){
+  body=body||'#ffd84d'; stripe=stripe||'#9b5cff';
   return `<svg viewBox="0 0 140 48"><path d="M40,8 L56,0 L72,8 M56,0 L56,8" stroke="#6a5a7a" stroke-width="2" fill="none"/>
-    <rect x="2" y="8" width="136" height="30" rx="9" fill="#ffd84d"/><rect x="2" y="28" width="136" height="5" fill="#9b5cff"/>
+    <rect x="2" y="8" width="136" height="30" rx="9" fill="${body}"/><rect x="2" y="28" width="136" height="5" fill="${stripe}"/>
     <g fill="#e3f6ff">${[10,26,42,58,74,90,106].map(x=>`<rect x="${x}" y="13" width="12" height="11" rx="2"/>`).join('')}<rect x="122" y="13" width="12" height="13" rx="3"/></g>
     ${star(70,30.5,2.2,'#fff')}${wheels([18,34,106,122],40,4)}<circle cx="137" cy="30" r="2.2" fill="#fff"/></svg>`;
 }
-function stopSvg(type){
+function stopSvg(type,color){
   const plate = type==='bus'
     ? `<rect x="3" y="18" width="14" height="9" rx="2" fill="#ff7ac0"/><rect x="5" y="20" width="4" height="3" fill="#fff"/><rect x="11" y="20" width="4" height="3" fill="#fff"/>`
-    : `<path d="M7,18 L10,15 L13,18" stroke="#6a5a7a" stroke-width="1" fill="none"/><rect x="2" y="18" width="16" height="9" rx="3" fill="#9b5cff"/><rect x="4" y="20" width="12" height="3" fill="#fff"/>`;
+    : `<path d="M7,18 L10,15 L13,18" stroke="#6a5a7a" stroke-width="1" fill="none"/><rect x="2" y="18" width="16" height="9" rx="3" fill="${color||'#9b5cff'}"/><rect x="4" y="20" width="12" height="3" fill="#fff"/>`;
   return `<svg viewBox="0 0 20 44"><rect x="9" y="12" width="2.4" height="32" rx="1" fill="#9b5cff"/><circle cx="10" cy="8" r="7.5" fill="#ffd84d" stroke="#3fbf8f" stroke-width="1.8"/>
     <text x="10" y="11.6" text-anchor="middle" font-size="10" font-weight="900" font-family="Arial,sans-serif" fill="#3fbf8f">H</text>${plate}</svg>`;
 }
@@ -2066,7 +2105,8 @@ function citySvg(){
       <line x1="-2" y1="86" x2="8" y2="86" stroke="#efe0f6" stroke-width="7"/><line x1="174" y1="86" x2="182" y2="86" stroke="#efe0f6" stroke-width="7"/>`;
   for(const e of CE){ if(e.type==='veh') continue; const A=CN[e.a],B=CN[e.b];
     s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#dcc6ec" stroke-width="5" stroke-linecap="round" stroke-dasharray=".1 1.6"/>`; }
-  s+=`<path d="M-2,85.1 H182 M-2,86.9 H182" stroke="#b8a9d6" stroke-width=".45"/>`;
+  for(const L of TRAM_LINES){ const d='M'+L.pts.map(q=>q.join(',')).join(' L');
+    s+=`<path d="${d}" stroke="${L.color}" stroke-width="2.6" fill="none" stroke-linejoin="round" opacity=".85"/><path d="${d}" stroke="#efe0f6" stroke-width="1.3" fill="none" stroke-linejoin="round"/>`; }
   // Dom mit Domstufen
   s+=`<polygon points="17,24 43,24 47,29 13,29" fill="#f1dccb"/><path d="M15.5,25.7 H44.5 M14.3,27.3 H45.7" stroke="#dcc0aa" stroke-width=".4"/>
     <rect x="22" y="10" width="16" height="14" fill="#d9c6f2"/><polygon points="21,10.5 30,3.5 39,10.5" fill="#ff9fd2"/>
@@ -2140,6 +2180,8 @@ function buildCity(){
   for(const k in PLACES){ const p=PLACES[k];
     h+=`<div class="cobj cbld" data-place="${k}" style="left:${p.x/1.8}%;top:${p.base}%;width:${p.w/1.8}%;z-index:${p.base*10}">${p.svg()}<div class="lbl clbl">${p.label()}</div></div>`; }
   STOPS.forEach((s,i)=>{ h+=`<div class="cobj cstop" data-stop="${i}" style="left:${(s.x+3)/1.8}%;top:${s.y-3}%;width:${6/1.8}%;z-index:${(s.y-3)*10}">${stopSvg(s.type)}</div>`; });
+  TRAM_LINES.forEach(L=>L.stops.forEach(([x,y],j)=>{ h+=`<div class="cobj cstop" data-tstop="${L.id}:${j}" style="left:${(x+3)/1.8}%;top:${y-3}%;width:${6/1.8}%;z-index:${Math.round((y-3)*10)}">${stopSvg('tram',L.color)}</div>`; }));
+  h+=`<svg class="leashLayer" viewBox="0 0 180 100" preserveAspectRatio="none"><path id="cLeash" d="" stroke="#ff4fa8" stroke-width="3" vector-effect="non-scaling-stroke" fill="none" stroke-linecap="round"/></svg>`;
   for(const [x,y] of [[30,15],[17.5,1.5],[42.5,1.5],[120,10],[127,32],[123,70],[20,38],[70,38],[104,38],[146,38],[66,77],[146,77],[150,12],[90,10]])
     h+=`<div class="cspk" style="left:${x/1.8}%;top:${y}%;animation-delay:${((x*7+y)%26)/10}s"><svg viewBox="0 0 20 20"><path d="M10,0 Q11,9 20,10 Q11,11 10,20 Q9,11 0,10 Q9,9 10,0Z" fill="#fff6b0"/></svg></div>`;
   h+=`<div class="tint" style="z-index:2500"></div>`+LAMP_POS.map(([x,y])=>`<div class="lglow" style="left:${x/1.8}%;top:${y-6.4}%"></div>`).join('');
@@ -2148,7 +2190,9 @@ function buildCity(){
   CT.av=cEnt(person(AVATARS[state.avatar].o),8,'cav');
   CT.pet=(state.pet && state.petCity!==false) ? cEnt(petSvg(state.pet,state.wear),state.pet.type==='dog'?8:7.5,'cpet') : null;
   if(CT.pet && state.sick) CT.pet.el.insertAdjacentHTML('beforeend',`<div class="cwish">${wishSvg('sick')}</div>`);
-  CT.npcs=[]; CT.cars=[]; CT.vehs=[]; CT.busy=null;
+  CT.npcs=[]; CT.cars=[]; CT.vehs=[]; CT.busy=null; CT.spot=null; CT.tramLine=null;
+  TRAM_LINES.forEach((L,i)=>{ const tr=cEnt(tramSvg(L.body,L.stripe),24,'veh ctram'); tr.el.dataset.tram=L.id; tr.zb=6;
+    Object.assign(tr,{s:L.L*(i?.25:.6), dir:i?1:-1, dwell:0, hold:false, ride:null, at:null}); L.tram=tr; });
   const ids=PED_NODES();
   for(let i=0;i<5;i++){
     const base=AVATARS[(i*2+1)%6].o, n=cEnt(person({...base,skin:SKINS[(i+2)%6],top:TOPS[i%6],sleeve:null}),6.5,'npc');
@@ -2164,7 +2208,8 @@ function goCity(from){
   CT.trail=[{x:CT.av.x-6,y:CT.av.y},{x:CT.av.x,y:CT.av.y}];
   if(CT.pet){ CT.pet.x=CT.av.x-5.5; CT.pet.y=CT.av.y; }
   renderMoney(false); petBtnRender(); applyDay();
-  setCityHint(t('cityHint'));
+  setCityHint(state.walk && walkDog() ? tn('walkGo') : t('cityHint'));
+  CT.pottyT=8+Math.random()*6; CT.pottyDone=false;
   CT.last=performance.now(); cancelAnimationFrame(CT.raf); CT.raf=requestAnimationFrame(cityLoop);
 }
 function stopCity(){ cancelAnimationFrame(CT.raf); CT.raf=0; CT.busy=null; CT.taxi=null; save(); }
@@ -2183,7 +2228,8 @@ function cityLoop(now){
   stepPath(a,dt);
   const lt=CT.trail[CT.trail.length-1];
   if(!lt || Math.hypot(a.x-lt.x,a.y-lt.y)>.4){ CT.trail.push({x:a.x,y:a.y}); if(CT.trail.length>120) CT.trail.shift(); }
-  if(CT.pet && CT.busy!=='ride'){
+  if(CT.pet && CT.busy==='potty') cityPotty(dt);
+  else if(CT.pet && CT.busy!=='ride'){
     const p=CT.pet, tp=trailPoint(5.5), d=Math.hypot(tp.x-p.x,tp.y-p.y);
     if(d>.05){ const s=Math.min(d,30*dt); if(Math.abs(tp.x-p.x)>.05) p.dir=tp.x>p.x?1:-1; p.x+=(tp.x-p.x)/d*s; p.y+=(tp.y-p.y)/d*s; p.el.classList.add('walking'); }
     else p.el.classList.remove('walking');
@@ -2192,6 +2238,10 @@ function cityLoop(now){
   for(const n of CT.npcs){ if(n.path) stepPath(n,dt); else { n.wait-=dt; if(n.wait<=0) npcNext(n); } cPos(n); }
   for(const c of CT.cars){ if(c.path) stepPath(c,dt); else { c.wait-=dt; if(c.wait<=0) carNext(c); } c.flip.style.transform=c.dir<0?'scaleX(-1)':'none'; cPos(c); }
   for(const v of CT.vehs){ stepPath(v,dt); v.flip.style.transform=v.dir<0?'scaleX(-1)':'none'; cPos(v); }
+  for(const L of TRAM_LINES) if(L.tram) tramStep(L,dt);
+  cityLeash();
+  if(walkDog() && !CT.pottyDone && !CT.busy){ CT.pottyT-=dt; if(CT.pottyT<=0) startCityPotty(); }
+  if(CT.spot && now-CT.spot.nag>30000){ CT.spot.nag=now; changeHappy(-3); setCityHint(t('cleanPlease')); }
   cPos(a);
   CT.raf=requestAnimationFrame(cityLoop);
 }
@@ -2214,7 +2264,12 @@ function bells(){ if(!ac()) return; const t=AC.currentTime+.01; [523,392,440,330
 $('city').addEventListener('pointerdown',e=>{
   if(current!=='s-city' || CT.busy) return;
   ac();
-  const b=e.target.closest('[data-place]'), st=e.target.closest('[data-stop]'), hit=e.target.closest('[data-hit]');
+  const st=e.target.closest('[data-stop]'), hit=e.target.closest('[data-hit]');
+  const cl=hitAt(e,'[data-clean]'), ts=hitAt(e,'[data-tstop]'), tm=hitAt(e,'[data-tram]');
+  const b=(ts||st)?null:e.target.closest('[data-place]');
+  if(cl){ pop(); cityWalkTo(CT.spot.x,CT.spot.y,()=>cleanCitySpot()); return; }
+  if(tm){ tryBoardTram(TRAM_LINES.find(L=>L.id===tm.dataset.tram)); return; }
+  if(ts){ const [id,j]=ts.dataset.tstop.split(':'), L=TRAM_LINES.find(q=>q.id===id), q=L.stops[+j]; pop(); setCityHint(t('tramWait')); cityWalkTo(q[0],q[1]); return; }
   if(b){ const p=PLACES[b.dataset.place]; pop(); cityWalkTo(p.node[0],p.node[1],()=>walkInto(b.dataset.place)); return; }
   if(st){ const s=STOPS[+st.dataset.stop]; pop(); cityWalkTo(s.x,s.y,()=>openDest(s.type)); return; }
   if(hit){ if(hit.dataset.hit==='dom'){ bells(); toast(t('dom')); } else { chime(); toast(t('bridge')); } }
@@ -2227,8 +2282,8 @@ function nearestPlace(){
   return best;
 }
 function openDest(mode){
-  if(CT.busy && !(mode==='taxi' && CT.busy==='taxiWait')) return;
-  const here = mode==='taxi' ? null : nearestPlace();
+  if(CT.busy && !(mode==='taxi' && CT.busy==='taxiWait') && !(mode==='tram' && CT.busy==='tramWait')) return;
+  const here = (mode==='taxi'||mode==='tram') ? null : nearestPlace();
   const btns=Object.keys(PLACES).filter(k=>k!==here).map(k=>`<button class="shopBtn destBtn" data-dest="${k}" data-mode="${mode}">${PLACES[k].svg()}<div class="lbl">${PLACES[k].label()}</div></button>`).join('');
   openSheet(`<div class="bagHead" style="font-size:clamp(18px,3.8vmin,32px)"><span style="width:3.2em;display:inline-block">${VEH[mode].svg()}</span><span>${t('whereTo')}</span></div>`+
     (mode==='taxi'?`<div class="mq small"><span class="spr">${COIN}${fmtMoney(TAXI_PRICE)}</span></div>`:'<div class="mq small"></div>')+
@@ -2332,6 +2387,7 @@ function startRide(mode,dest){
     rideTo(v,dest,VEH.taxi,'Taxi');
     return;
   }
+  if(mode==='tram'){ if(CT.busy==='tramWait' && CT.tramLine) rideTram(CT.tramLine,dest); return; }
   if(CT.busy) return;
   const V=VEH[mode], key=mode==='bus'?'Bus':'Tram';
   CT.busy='wait'; CT.av.path=null; CT.av.el.classList.remove('walking');
@@ -2551,7 +2607,8 @@ function goPark(){
   PK.av=mkEntIn(p,person(AVATARS[state.avatar].o),10,false); PK.av.x=.2; PK.av.y=.1;
   PK.pet=mkEntIn(p,petSvg(state.pet,state.wear),state.pet.type==='dog'?12:11,true); PK.pet.x=.32; PK.pet.y=.08;
   if(state.sick) PK.pet.el.classList.add('sick');
-  PK.ball=$('pkBall'); PK.phase='idle'; PK.anim=null; PK.done=new Set(); PK.talk=4;
+  PK.ball=$('pkBall'); PK.phase='idle'; PK.anim=null; PK.done=new Set(); PK.talk=4; PK.pottyT=7+Math.random()*5; PK.pottyDone=false; PK.spot=null;
+  p.insertAdjacentHTML('beforeend',`<svg class="leashLayer" viewBox="0 0 100 100" preserveAspectRatio="none" style="z-index:250"><path id="pLeash" d="" stroke="#ff4fa8" stroke-width="3" vector-effect="non-scaling-stroke" fill="none" stroke-linecap="round"/></svg>`);
   p.insertAdjacentHTML('beforeend', OBST.map((o,i)=>`<div class="it tap obst" data-ob="${i}" style="left:${o.x*100}%;bottom:${o.b*100}%;width:${o.w*100}%;z-index:${100-Math.round(o.b*100)}">${o.svg()}<div class="obNum">${i+1}</div></div>`).join('')+
     `<div class="courseBar" id="courseBar">${OBST.map((o,i)=>`<span data-cb="${i}">${i+1}</span>`).join('')}</div>`);
   PK.npcs=[];
@@ -2610,6 +2667,11 @@ function parkLoop(now){
       d.innerHTML=heartSvg(true).replace('<svg','<svg style="width:28px"'); $('park').appendChild(d); setTimeout(()=>d.remove(),2000);
     }
   }
+  parkLeash();
+  if(walkDog() && !PK.pottyDone && PK.phase==='idle'){ PK.pottyT-=dt; if(PK.pottyT<=0) startParkPotty(); }
+  if(PK.phase==='potty' && !pet.target && !PK.pottyDoing){ PK.pottyDoing=true; pet.el.classList.add('potty'); tinkle();
+    later(()=>{ pet.el.classList.remove('potty'); PK.pottyDoing=false; PK.phase='idle'; PK.pottyDone=true; makeParkSpot(); goTo(pet,Math.min(.95,av.x+.1),av.y,-1); },1600); }
+  if(PK.spot && now-PK.spot.nag>30000){ PK.spot.nag=now; changeHappy(-3); parkHint(t('cleanPlease')); }
   if(PK.phase==='idle' && !pet.target && Math.random()<.004) goTo(pet,Math.max(.05,Math.min(.95,av.x+.08+Math.random()*.15)),Math.max(.03,Math.min(.4,av.y+(Math.random()-.5)*.1)));
   renderEnt(av); renderEnt(pet);
   PK.raf=requestAnimationFrame(parkLoop);
@@ -2619,6 +2681,7 @@ $('park').addEventListener('pointerdown',e=>{
   ac();
   const r=$('park').getBoundingClientRect();
   const x=Math.max(.06,Math.min(.94,(e.clientX-r.left)/r.width)), y=Math.max(.03,Math.min(.5,(r.bottom-e.clientY)/r.height));
+  if(hitAt(e,'[data-clean]')){ cleanParkSpot(); return; }
   if(e.target.closest('.ent')===PK.pet.el){ petPark(); return; }
   const ob=e.target.closest('.obst'); if(ob){ startObstacle(+ob.dataset.ob); return; }
   PK.phase='throw'; boing();
@@ -2887,6 +2950,221 @@ document.querySelectorAll('.albumBtn').forEach(b=>{ b.innerHTML=ALBUM_SVG; b.add
 document.querySelectorAll('.gameBtn').forEach(b=>{ b.innerHTML=GAME_SVG; b.addEventListener('click',()=>{ if(current==='s-home' && HM.act) return; pop(); goGame(b.dataset.from); }); });
 ['vetBack','parkBack','gameBack','albumBack'].forEach(id=>$(id).innerHTML=BACK_ICON);
 window.addEventListener('resize',()=>{ if(current==='s-park') fitPark(); });
+
+/* =====================================================================
+   KLO, GASSI GEHEN UND ECHTE STRASSENBAHN
+   ===================================================================== */
+const SHOVEL_SVG=`<svg viewBox="0 0 40 40"><rect x="18" y="2" width="4" height="22" rx="2" fill="#9b5cff"/><rect x="14" y="1" width="12" height="5" rx="2.5" fill="#ff7ac0"/><path d="M10,22 H30 L28,36 Q20,40 12,36Z" fill="#7ad7ff"/></svg>`;
+const BAGPOO_SVG=`<svg viewBox="0 0 40 40"><path d="M10,12 L30,12 L33,36 Q20,40 7,36Z" fill="#9ff0cf"/><path d="M14,12 Q16,4 20,8 Q24,4 26,12" stroke="#3fbf8f" stroke-width="2.5" fill="none"/>${heart(20,25,.7,'#fff')}</svg>`;
+const LEASH_SVG=`<svg viewBox="0 0 40 40"><path d="M8,30 C4,18 14,6 24,8 C34,10 34,22 26,26" stroke="#ff4fa8" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="8" cy="30" r="5" fill="none" stroke="#9b5cff" stroke-width="3.5"/><rect x="23" y="24" width="8" height="10" rx="3" fill="#ffd84d"/>${PAW(30,12,.35,'#9b5cff')}</svg>`;
+const STINK=(x,y)=>`<path d="M${x},${y} q3,-3 0,-6 q-3,-3 0,-6 M${x+8},${y-2} q3,-3 0,-6 q-3,-3 0,-6" stroke="#c9a7ff" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+function pottySvg(){
+  const cat=state.pet && state.pet.type==='cat', dirty=state.dirty;
+  const hint=dirty?`<g transform="translate(92,-26)"><g class="shovelHint"><svg x="0" y="0" width="26" height="26" viewBox="0 0 40 40">${SHOVEL_SVG.replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg></g></g>`:'';
+  if(cat) return `<svg viewBox="0 0 120 60"><rect x="6" y="14" width="108" height="44" rx="12" fill="#ff9fd2"/><rect x="14" y="10" width="92" height="16" rx="8" fill="#f2d9b8"/>
+    <g fill="#e6c79c"><circle cx="30" cy="16" r="1.6"/><circle cx="70" cy="14" r="1.6"/><circle cx="90" cy="18" r="1.6"/></g>${PAW(60,42,.8,'#fff')}${star(20,40,4,'#ffd84d')}${star(100,40,4,'#ffd84d')}
+    ${dirty?`<g fill="#d9b48a"><circle cx="50" cy="15" r="5"/><circle cx="58" cy="13" r="4"/></g>${STINK(48,4)}`:''}${hint}</svg>`;
+  return `<svg viewBox="0 0 120 40"><path d="M8,36 L22,8 L98,8 L112,36Z" fill="#e9f8ff" stroke="#7ad7ff" stroke-width="3" stroke-linejoin="round"/>
+    ${PAW(40,24,.45,'#ff9fd2')}${PAW(62,18,.45,'#c9a7ff')}${PAW(82,26,.45,'#ff9fd2')}
+    ${dirty?`<ellipse cx="60" cy="24" rx="18" ry="6" fill="#fff3a0" opacity=".95"/>${STINK(54,12)}`:''}${hint}</svg>`;
+}
+function setPottyItem(){ const el=document.querySelector('.pottyItem'); if(el) el.innerHTML=pottySvg(); }
+function tinkle(){ if(!ac()) return; const t=AC.currentTime+.01; [1319,1568,1760,2093].forEach((f,i)=>tone(f,t+i*.18,.25,'sine',.08)); }
+function sparkleSnd(){ if(!ac()) return; const t=AC.currentTime+.01; [2093,2637,3136].forEach((f,i)=>tone(f,t+i*.07,.3,'triangle',.1)); }
+function cleanPotty(){
+  if(HM.act || !state.dirty) return;
+  state.dirty=false; HM.dirtyT=0; save();
+  const el=document.querySelector('.pottyItem');
+  fx('',SHOVEL_SVG.replace('<svg','<svg style="width:40px"'),.74,.08,{'--up':'60px','--dx':'20px','--d':'1.2s'});
+  for(let i=0;i<6;i++) later(()=>fx('',`<svg viewBox="0 0 20 20" style="width:20px"><path d="M10,0 Q11,9 20,10 Q11,11 10,20 Q9,11 0,10 Q9,9 10,0Z" fill="#ffd84d"/></svg>`,.7+Math.random()*.08,.05,{'--dx':(Math.random()*40-20)+'px','--up':'70px'}),i*90);
+  if(el){ el.classList.remove('wig'); void el.offsetWidth; el.classList.add('wig'); }
+  later(setPottyItem,300);
+  sparkleSnd(); changeHappy(5); giveMoney(5); setHint(t('cleanDone'));
+}
+$('leashBtn').innerHTML=LEASH_SVG;
+$('leashBtn').addEventListener('click',()=>{
+  if(HM.act || !state.pet || state.pet.type!=='dog') return;
+  state.walk=true; state.petCity=true; save(); pop(); goCity('home');
+});
+function hitAt(e,sel){ if(!document.elementsFromPoint) return e.target.closest(sel); for(const el of document.elementsFromPoint(e.clientX,e.clientY)){ const h=el.closest&&el.closest(sel); if(h) return h; } return null; }
+const walkDog=()=>state.walk && state.pet && state.pet.type==='dog' && state.petCity!==false;
+
+/* Gassi in der Stadt */
+const CITY_TREES=[[14,64],[48,64],[70,44],[105,62],[12,99],[40,99],[66,99],[96,99],[148,99]];
+function cityLeash(){
+  const path=$('cLeash'); if(!path) return;
+  const p=CT.pet, a=CT.av;
+  if(!walkDog() || !p || p.el.classList.contains('hide') || a.el.classList.contains('hide')){ path.setAttribute('d',''); return; }
+  const o=DOGS[state.pet.i].o, [nx,ny]=dogNeck(o), sc=8/220;
+  const off=(nx-110)*sc*(p.dir>0?-1:1);
+  const hx=a.x+2, hy=a.y-2.5, px=p.x+off, py=p.y-(170-ny)*sc;
+  path.setAttribute('d',`M${hx.toFixed(2)},${hy.toFixed(2)} Q${((hx+px)/2).toFixed(2)},${(Math.max(hy,py)+2.5).toFixed(2)} ${px.toFixed(2)},${py.toFixed(2)}`);
+}
+function startCityPotty(){
+  const p=CT.pet; if(!p) return;
+  let best=CITY_TREES[0], bd=1e9; for(const tq of CITY_TREES){ const d=Math.hypot(tq[0]-p.x,tq[1]-p.y); if(d<bd){ bd=d; best=tq; } }
+  CT.busy='potty'; CT.av.path=null; CT.av.el.classList.remove('walking');
+  CT.pAnim={tx:best[0]+3, ty:best[1], stage:'go', t:0};
+}
+function cityPotty(dt){
+  const p=CT.pet, A=CT.pAnim;
+  if(A.stage==='go'){
+    const d=Math.hypot(A.tx-p.x,A.ty-p.y);
+    if(d>.3){ const s=Math.min(d,20*dt); if(Math.abs(A.tx-p.x)>.05) p.dir=A.tx>p.x?1:-1; p.x+=(A.tx-p.x)/d*s; p.y+=(A.ty-p.y)/d*s; p.el.classList.add('walking'); }
+    else { A.stage='do'; A.t=1.6; p.el.classList.remove('walking'); p.el.classList.add('potty'); tinkle(); }
+  }else{
+    A.t-=dt;
+    if(A.t<=0){
+      p.el.classList.remove('potty'); CT.busy=null; CT.pottyDone=true;
+      const x=A.tx+1.5, y=A.ty;
+      const el=document.createElement('div'); el.className='cobj cspot'; el.dataset.clean='1';
+      el.style.left=(x/1.8)+'%'; el.style.top=y+'%'; el.style.width=(5/1.8)+'%'; el.style.zIndex=Math.round(y*10)+2;
+      el.innerHTML=`<svg viewBox="0 0 40 40"><ellipse cx="20" cy="34" rx="12" ry="4" fill="#e8d2b4"/><path d="M12,33 Q12,25 20,24 Q28,25 28,33Z" fill="#c9a07a"/><path d="M15,25 Q16,19 21,19 Q26,20 24,25Z" fill="#c9a07a"/>${star(8,14,4,'#fff')}${star(32,12,3,'#ffd84d')}</svg><div class="bagHint">${BAGPOO_SVG}</div>`;
+      $('city').appendChild(el);
+      CT.spot={x,y,t0:performance.now(),nag:performance.now(),el};
+      setCityHint(tn('pottyOut'));
+    }
+  }
+  p.flip.style.transform=p.dir>0?'scaleX(-1)':'none'; cPos(p);
+}
+function rewardClean(t0,hintFn){
+  const quick=performance.now()-t0<15000, n=quick?15:10;
+  state.money+=n; save(); renderMoney(true); coinSnd(); sparkleSnd(); changeHappy(n);
+  hintFn((quick?t('quick')+' ':'')+t('bagDone')+' +'+fmtMoney(n));
+}
+function cleanCitySpot(){
+  const sp=CT.spot; if(!sp) return;
+  CT.spot=null;
+  sp.el.innerHTML=`<svg viewBox="0 0 40 40">${star(20,20,12,'#ffd84d')}</svg>`; sp.el.classList.add('cleaned');
+  setTimeout(()=>sp.el.remove(),700);
+  rewardClean(sp.t0,setCityHint);
+}
+
+/* Gassi im Park */
+const PARK_TREES=[[8,40],[52,36],[118,36],[172,40],[70,38],[160,36]].map(([x,y])=>[x/180,(100-y)/100]);
+function parkLeash(){
+  const path=$('pLeash'); if(!path) return;
+  const p=PK.pet, a=PK.av;
+  if(!walkDog() || !p || !['idle','potty'].includes(PK.phase)){ path.setAttribute('d',''); return; }
+  const o=DOGS[state.pet.i].o, [nx,ny]=dogNeck(o), w=.12, ph=w*170/220*1.8;
+  const off=(nx-110)/220*w*(p.dir>0?-1:1);
+  const hx=a.x+.025, hy=a.y+.056, px=p.x+off, py=p.y+ph*(170-ny)/170;
+  const X=v=>(v*100).toFixed(2), Y=v=>((1-v)*100).toFixed(2);
+  path.setAttribute('d',`M${X(hx)},${Y(hy)} Q${X((hx+px)/2)},${Y(Math.min(hy,py)-.04)} ${X(px)},${Y(py)}`);
+}
+function startParkPotty(){
+  const p=PK.pet; let best=PARK_TREES[0], bd=1e9;
+  for(const tq of PARK_TREES){ const d=Math.hypot(tq[0]-p.x,(tq[1]-p.y)/1.8); if(d<bd){ bd=d; best=tq; } }
+  PK.phase='potty'; PK.pottyDoing=false; PK.pTree=best;
+  goTo(p,Math.min(.95,best[0]+.025),best[1]-.01);
+}
+function makeParkSpot(){
+  const [tx,ty]=PK.pTree, x=Math.min(.95,tx+.04), y=ty-.015;
+  const el=document.createElement('div'); el.className='it tap pspot'; el.dataset.clean='1';
+  el.style.left=(x*100)+'%'; el.style.bottom=(y*100)+'%'; el.style.width='3%'; el.style.zIndex=100-Math.round(y*100)+1;
+  el.innerHTML=`<svg viewBox="0 0 40 40"><ellipse cx="20" cy="34" rx="12" ry="4" fill="#e8d2b4"/><path d="M12,33 Q12,25 20,24 Q28,25 28,33Z" fill="#c9a07a"/><path d="M15,25 Q16,19 21,19 Q26,20 24,25Z" fill="#c9a07a"/>${star(8,14,4,'#fff')}${star(32,12,3,'#ffd84d')}</svg><div class="bagHint">${BAGPOO_SVG}</div>`;
+  $('park').appendChild(el);
+  PK.spot={x,y,t0:performance.now(),nag:performance.now(),el};
+  parkHint(tn('pottyOut'));
+}
+function cleanParkSpot(){
+  const sp=PK.spot; if(!sp) return;
+  PK.spot=null;
+  sp.el.innerHTML=`<svg viewBox="0 0 40 40">${star(20,20,12,'#ffd84d')}</svg>`;
+  setTimeout(()=>sp.el.remove(),700);
+  rewardClean(sp.t0,parkHint);
+}
+
+/* Echte Straßenbahn: 2 Linien auf Schienen */
+const TRAM_LINES=[
+  {id:'A', color:'#ff7ac0', body:'#ffb3dc', stripe:'#ff4fa8', pts:[[2,86],[178,86]], stops:[[10,86],[52,86],[86,86],[140,86],[172,86]]},
+  {id:'B', color:'#9b5cff', body:'#d9c6ff', stripe:'#7b3fe0', pts:[[60,26],[60,48],[90,48],[90,86],[112,86],[138,86],[138,48],[178,48]], stops:[[60,32],[70,48],[90,60],[138,66],[172,48]]}
+];
+const TRAM_SPEED=21;
+for(const L of TRAM_LINES){
+  L.seg=[]; let acc=0;
+  for(let i=0;i<L.pts.length-1;i++){ const [x1,y1]=L.pts[i],[x2,y2]=L.pts[i+1], len=Math.hypot(x2-x1,y2-y1); L.seg.push({x1,y1,x2,y2,s0:acc,len}); acc+=len; }
+  L.L=acc;
+  L.stopS=L.stops.map(([x,y])=>{ let best=null; for(const g of L.seg){ const dx=g.x2-g.x1, dy=g.y2-g.y1;
+      const u=Math.max(0,Math.min(1,((x-g.x1)*dx+(y-g.y1)*dy)/(g.len*g.len))); const px=g.x1+u*dx, py=g.y1+u*dy, d=Math.hypot(px-x,py-y);
+      if(!best||d<best.d) best={d,s:g.s0+u*g.len,x:px,y:py}; } return {x:best.x,y:best.y,s:best.s}; }).sort((a,b)=>a.s-b.s);
+}
+function tramPos(L,s){
+  for(const g of L.seg){ if(s<=g.s0+g.len+1e-6){ const u=g.len?(s-g.s0)/g.len:0; return {x:g.x1+(g.x2-g.x1)*u, y:g.y1+(g.y2-g.y1)*u, dx:g.x2-g.x1}; } }
+  const g=L.seg[L.seg.length-1]; return {x:g.x2,y:g.y2,dx:g.x2-g.x1};
+}
+function tramStep(L,dt){
+  const tr=L.tram;
+  if(!tr.hold){
+    if(tr.dwell>0) tr.dwell-=dt;
+    else{
+      const goal = tr.ride ? tr.ride.s : (tr.dir>0 ? L.L : 0);
+      const dir = Math.sign(goal-tr.s) || tr.dir; tr.dir=dir;
+      let next=null;
+      for(const st of L.stopS){
+        const ahead = dir>0 ? (st.s>tr.s+.01 && st.s<=goal+.001) : (st.s<tr.s-.01 && st.s>=goal-.001);
+        if(ahead && (!next || Math.abs(st.s-tr.s)<Math.abs(next.s-tr.s))) next=st;
+      }
+      const lim = next ? next.s : goal;
+      const ns = tr.s + dir*TRAM_SPEED*dt;
+      if((dir>0 && ns>=lim) || (dir<0 && ns<=lim) || Math.abs(goal-tr.s)<.01){
+        tr.s=lim;
+        if(tr.ride && Math.abs(lim-tr.ride.s)<.02){ arriveTram(L); }
+        else if(next && Math.abs(lim-next.s)<.02){ tr.dwell = tr.ride ? .6 : 2.4; tr.at=next; }
+        else { tr.dir*=-1; tr.dwell=1.2; tr.at=null; }
+      } else { tr.s=ns; tr.at=null; }
+    }
+  }
+  const q=tramPos(L,tr.s); tr.x=q.x; tr.y=q.y;
+  if(Math.abs(q.dx)>.01) tr.face = (q.dx*tr.dir>0) ? 1 : -1;
+  tr.flip.style.transform = tr.face<0 ? 'scaleX(-1)' : 'none';
+  const ready = !CT.busy && tr.at && !tr.ride && Math.hypot(CT.av.x-tr.at.x, CT.av.y-tr.at.y)<=8;
+  tr.el.classList.toggle('ready', !!ready);
+  cPos(tr);
+}
+function tryBoardTram(L){
+  if(!L || CT.busy) return;
+  const tr=L.tram;
+  if(!tr.at || tr.ride){ pop(); setCityHint(t('tramNotNow')); return; }
+  if(Math.hypot(CT.av.x-tr.at.x, CT.av.y-tr.at.y)>8){ pop(); setCityHint(t('goToStop')); return; }
+  tr.hold=true; CT.busy='board'; CT.tramLine=L; pop();
+  const a=CT.av;
+  follow(a,[{x:a.x,y:a.y},{x:tr.x,y:tr.y}],12,()=>{
+    a.el.classList.add('hide');
+    later(()=>{
+      if(CT.pet) CT.pet.el.classList.add('hide');
+      tr.el.insertAdjacentHTML('beforeend',paxHtml()); horn();
+      CT.busy='tramWait'; openDest('tram');
+    },350);
+  });
+}
+function tramAlight(){
+  const L=CT.tramLine; if(!L) return;
+  const tr=L.tram, px=tr.el.querySelector('.pax'); if(px) px.remove();
+  CT.av.x=tr.x; CT.av.y=tr.y; CT.trail=[{x:tr.x-6,y:tr.y},{x:tr.x,y:tr.y}];
+  CT.av.el.classList.remove('hide');
+  if(CT.pet){ CT.pet.x=tr.x-5.5; CT.pet.y=tr.y; CT.pet.el.classList.remove('hide'); }
+  tr.hold=false; tr.dwell=1.5; CT.busy=null; CT.tramLine=null; setCityHint(t('cityHint'));
+}
+function rideTram(L,dest){
+  const tr=L.tram, D=PLACES[dest];
+  let st=L.stopS[0], bd=1e9;
+  for(const q of L.stopS){ const d=Math.hypot(q.x-D.node[0],q.y-D.node[1]); if(d<bd){ bd=d; st=q; } }
+  tr.ride={s:st.s, st, dest}; tr.hold=false; tr.dwell=0; tr.at=null;
+  CT.busy='ride'; setCityHint(t('rideTram'));
+}
+function arriveTram(L){
+  const tr=L.tram, r=tr.ride; tr.ride=null; tr.dwell=2.8; tr.at=r.st;
+  horn(); chime();
+  const px=tr.el.querySelector('.pax'); if(px) px.remove();
+  const q=tramPos(L,tr.s);
+  CT.av.x=q.x; CT.av.y=q.y; CT.trail=[{x:q.x-6,y:q.y},{x:q.x,y:q.y}];
+  CT.av.el.classList.remove('hide');
+  if(CT.pet){ CT.pet.x=q.x-5.5; CT.pet.y=q.y; CT.pet.el.classList.remove('hide'); }
+  CT.tramLine=null; CT.busy='enter'; setCityHint(t('arrived'));
+  const D=PLACES[r.dest];
+  later(()=>cityWalkTo(D.node[0],D.node[1],()=>walkInto(r.dest)),400);
+}
 
 /* ----- общие кнопки ----- */
 document.querySelectorAll('[data-back]').forEach(b=>{

@@ -1,6 +1,6 @@
 // Offline-Speicher: das Spiel funktioniert ohne Internet, wenn es einmal geöffnet war.
 // Bei jeder neuen Spielversion die Nummer erhöhen, dann lädt das Tablet die neue Version.
-const CACHE = 'kpop-tiere-v4';
+const CACHE = 'kpop-tiere-v5';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
