@@ -355,6 +355,42 @@ h2{font-size:clamp(22px,5.4vmin,46px);text-shadow:0 3px 0 #e0559f,0 6px 0 #9b5cf
 .cspot.cleaned svg{animation:pop .4s ease reverse}
 .ctram.ready .flip svg{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px #ffd84d);animation:bob .8s ease-in-out infinite}
 
+/* ---------- Imbiss, Jahreszeiten, Advent ---------- */
+.seasons{flex-wrap:wrap;justify-content:center;gap:1.2vmin;max-width:92vw}
+.seasons .lang{padding:6px 12px;font-size:clamp(13px,2.4vmin,20px)}
+.seasonLbl{font-weight:900;color:#fff;text-shadow:0 2px 0 #9b5cff;align-self:center;font-size:clamp(14px,2.6vmin,22px)}
+.city .npc,.city .veh:not(.ctram),.city .cav,.city .cpet{pointer-events:none}
+.seasonLayer{position:absolute;left:0;top:0;width:100%;height:100%;z-index:5;pointer-events:none}
+.flake{position:absolute;top:-4%;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff;z-index:2700;pointer-events:none;animation:snow linear infinite}
+@keyframes snow{from{transform:translate(0,0)}to{transform:translate(20px,110vh)}}
+.leaf{position:absolute;top:-4%;width:1.4%;z-index:2700;pointer-events:none;animation:leafFall linear infinite}
+@keyframes leafFall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(30px,55vh) rotate(180deg)}100%{transform:translate(-10px,110vh) rotate(360deg)}}
+.bfly{position:absolute;width:2.2%;z-index:2700;pointer-events:none;animation:bfly 6s ease-in-out infinite alternate}
+@keyframes bfly{0%{transform:translate(0,0)}33%{transform:translate(60px,-30px)}66%{transform:translate(120px,10px)}100%{transform:translate(180px,-20px)}}
+.cegg svg{height:auto;animation:bob 1.4s ease-in-out infinite}
+.carHorse{animation:carBob 1s ease-in-out infinite alternate}
+@keyframes carBob{from{transform:translateY(-3px)}to{transform:translateY(3px)}}
+.snackBg{background:repeating-linear-gradient(90deg,#fff1d6 0 40px,#ffe8c4 40px 80px)}
+.snackWrap{flex:1;min-height:0;display:flex;gap:3vmin;align-items:stretch;padding-bottom:1.5vmin}
+.snackScene{position:relative;flex:1.2;border:5px solid #fff;border-radius:26px;overflow:hidden;box-shadow:0 6px 0 rgba(155,92,255,.35)}
+.snackCounter{position:absolute;left:50%;top:4%;width:62%;transform:translateX(-50%);opacity:.95}
+.snackCounter svg{height:auto}
+.snackScene .ent .flip svg{height:auto}
+.snackFood{position:absolute;width:16%;transform:translate(-50%,0);z-index:120;transition:transform .2s}
+.snackFood svg{height:auto}
+.flakeBox{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.flakeBox .flake{width:6px;height:6px;z-index:5}
+.snackMenu{flex:1;display:grid;grid-template-columns:repeat(2,1fr);grid-auto-rows:minmax(0,1fr);gap:2vmin;min-height:0}
+.calGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:1.4vmin;margin:1vmin 0}
+.calDoor{aspect-ratio:1;border-radius:12px;font-weight:900;font-size:clamp(16px,3.4vmin,28px);color:#fff;background:#ff7ac0;box-shadow:0 4px 0 #c2368a;display:flex;align-items:center;justify-content:center;padding:4px}
+.calDoor:nth-child(4n+2){background:#9b5cff;box-shadow:0 4px 0 #5b2bb5}
+.calDoor:nth-child(4n+3){background:#3fbf8f;box-shadow:0 4px 0 #2e9e6a}
+.calDoor:nth-child(4n){background:#7ad7ff;box-shadow:0 4px 0 #3fa8d8}
+.calDoor.open{background:#fff6b0;box-shadow:0 4px 0 #ffd84d}
+.calDoor.today{outline:4px solid #ffd84d;animation:beat .9s ease-in-out infinite}
+.calDoor .pi{display:block;width:80%;height:80%}
+.calDoor .pi svg{width:100%;height:100%}
+
 @media (orientation:portrait){
   .avatars{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr))}
   .kennels{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,minmax(0,1fr))}
@@ -382,6 +418,7 @@ h2{font-size:clamp(22px,5.4vmin,46px);text-shadow:0 3px 0 #e0559f,0 6px 0 #9b5cf
   <h1 class="logo" data-t="title"></h1>
   <button class="pill" id="btnPlay" data-t="play"></button>
   <div class="langs" id="langs"></div>
+  <div class="langs seasons" id="seasons"></div>
 </section>
 
 <section class="screen" id="s-avatar">
@@ -483,6 +520,11 @@ h2{font-size:clamp(22px,5.4vmin,46px);text-shadow:0 3px 0 #e0559f,0 6px 0 #9b5cf
   <div class="albumGrid" id="albumGrid"></div>
 </section>
 
+<section class="screen snackBg" id="s-snack">
+  <div class="top"><button class="rbtn" id="snackBack"></button><h2 id="snackTitle"></h2><div class="money"></div></div>
+  <div class="snackWrap"><div class="snackScene" id="snackScene"></div><div class="snackMenu" id="snackMenu"></div></div>
+</section>
+
 <div id="flash"></div>
 <div class="modal" id="sheet2"><div class="sheet" id="sheet2In"></div></div>
 <div id="toast"></div>
@@ -537,6 +579,13 @@ const T = {
       wish_potty:'{name} хочет в туалет!',pottyDone:'Готово! Теперь убери совочком ✨',cleanDone:'Чистота! ✨',
       cleanPlease:'Пожалуйста, убери — нажми туда!',quick:'Быстрая помощь! Дополнительные монетки!',walkGo:'Прогулка! {name} идёт на поводке.',
       pottyOut:'Остановка у дерева! Нажми на пятнышко и убери пакетиком!',bagDone:'Убрано пакетиком — супер!',
+      doener:'Донер',cafe:'Кафе',market:'Рождественская ярмарка',snackYum:'Ням, вкусно! {name} тоже получает лакомство.',
+      season:'Время года',sAuto:'Авто',sSpring:'Весна',sSummer:'Лето',sAutumn:'Осень',sWinter:'Зима',sXmas:'Рождество',sEaster:'Пасха',
+      eggFound:'Пасхальное яйцо! +3 €',eggsAll:'Ура, ты нашёл(ла) все яйца!',
+      calTitle:'Адвент-календарь',calToday:'Открой сегодня окошко {d}!',calWait:'Это окошко ещё закрыто — жди {d} декабря!',
+      calDone:'Сегодняшнее окошко уже открыто. Завтра будет новое!',calNotDec:'Окошки открываются с 1 по 24 декабря.',calPast:'Этот день уже прошёл.',
+      calBought:'Адвент-календарь теперь висит у тебя дома!',calHave:'Календарь у тебя уже есть!',
+      prizeCoins:'Монетки!',prizeTreat:'Лакомства в рюкзаке!',prizeGlitter:'Блестящее волшебство!',prizeItem:'Новое в рюкзаке: {item}!',prizeBig:'С Рождеством! Большой сюрприз!',
       tramWait:'Подожди трамвай и нажми на него, когда он остановится!',tramNotNow:'Трамвай сейчас здесь не стоит.',goToStop:'Сначала подойди к остановке!',courseHint:'Нажми на препятствие — питомец пройдёт полосу!',jumpGood:'Оп! Отличный прыжок!',
       tunnelGood:'Через туннель — ура!',slalomGood:'Слалом пройден!',rampGood:'Вверх и вниз — здорово!',
       courseProg:'Пройдено {d} из 4!',courseDone:'Вся полоса пройдена! +{m} и сердечки!',
@@ -573,6 +622,13 @@ const T = {
       wish_potty:'{name} trebuie la toaletă!',pottyDone:'Gata! Acum curăță cu lopățica ✨',cleanDone:'Curat lună! ✨',
       cleanPlease:'Te rog curăță – atinge acolo!',quick:'Ajutor rapid! Monede în plus!',walkGo:'La plimbare! {name} vine în lesă.',
       pottyOut:'Pauză la copac! Atinge pata și curăță cu punguța!',bagDone:'Curățat cu punguța – super!',
+      doener:'Döner',cafe:'Cafenea',market:'Târg de Crăciun',snackYum:'Mmm, gustos! Și {name} primește o recompensă.',
+      season:'Anotimp',sAuto:'Automat',sSpring:'Primăvară',sSummer:'Vară',sAutumn:'Toamnă',sWinter:'Iarnă',sXmas:'Crăciun',sEaster:'Paște',
+      eggFound:'Un ou de Paște! +3 €',eggsAll:'Ura, ai găsit toate ouăle!',
+      calTitle:'Calendar de Advent',calToday:'Deschide azi ferestruica {d}!',calWait:'Ferestruica e încă închisă – așteaptă până pe {d} decembrie!',
+      calDone:'Ai deschis deja ferestruica de azi. Mâine e una nouă!',calNotDec:'Ferestruicile se deschid între 1 și 24 decembrie.',calPast:'Ziua aceasta a trecut.',
+      calBought:'Calendarul de Advent e acum în casa ta!',calHave:'Ai deja calendarul!',
+      prizeCoins:'Monede!',prizeTreat:'Recompense în rucsac!',prizeGlitter:'Magie strălucitoare!',prizeItem:'Nou în rucsac: {item}!',prizeBig:'Crăciun fericit! O surpriză mare!',
       tramWait:'Așteaptă tramvaiul și atinge-l când oprește!',tramNotNow:'Tramvaiul nu oprește aici acum.',goToStop:'Mergi mai întâi la stație!',courseHint:'Atinge un obstacol – animăluțul face traseul!',jumpGood:'Hop! Ce săritură!',
       tunnelGood:'Prin tunel – ura!',slalomGood:'Slalom reușit!',rampGood:'Sus și jos – grozav!',
       courseProg:'{d} din 4 reușite!',courseDone:'Tot traseul e gata! +{m} și inimioare!',
@@ -609,6 +665,13 @@ const T = {
       wish_potty:'{name} muss aufs Klo!',pottyDone:'Fertig! Jetzt mit der Schaufel sauber machen ✨',cleanDone:'Blitzsauber! ✨',
       cleanPlease:'Bitte sauber machen – tippe darauf!',quick:'Schnell geholfen! Extra Münzen!',walkGo:'Gassi gehen! {name} kommt an der Leine mit.',
       pottyOut:'{name} war am Baum. Tippe auf den Fleck und mach mit dem Beutel sauber!',bagDone:'Mit dem Beutel sauber gemacht – super!',
+      doener:'Döner',cafe:'Café',market:'Weihnachtsmarkt',snackYum:'Mmm, lecker! {name} bekommt auch ein Leckerli.',
+      season:'Jahreszeit',sAuto:'Automatisch',sSpring:'Frühling',sSummer:'Sommer',sAutumn:'Herbst',sWinter:'Winter',sXmas:'Weihnachten',sEaster:'Ostern',
+      eggFound:'Ein Osterei! +3 €',eggsAll:'Juhu, du hast alle Eier gefunden!',
+      calTitle:'Adventskalender',calToday:'Öffne heute Türchen {d}!',calWait:'Dieses Türchen ist noch zu – warte bis zum {d}. Dezember!',
+      calDone:'Heute hast du dein Türchen schon geöffnet. Morgen gibt es ein neues!',calNotDec:'Die Türchen gehen vom 1. bis 24. Dezember auf.',calPast:'Dieser Tag ist schon vorbei.',
+      calBought:'Der Adventskalender hängt jetzt in deinem Haus!',calHave:'Den Kalender hast du schon!',
+      prizeCoins:'Münzen!',prizeTreat:'Leckerlis im Rucksack!',prizeGlitter:'Glitzer-Zauber!',prizeItem:'Neu im Rucksack: {item}!',prizeBig:'Frohe Weihnachten! Eine große Überraschung!',
       tramWait:'Warte auf die Straßenbahn und tippe auf sie, wenn sie hält!',tramNotNow:'Die Bahn hält hier gerade nicht.',goToStop:'Geh zuerst zur Haltestelle!',courseHint:'Tippe auf ein Hindernis – dein Tier macht den Parcours!',jumpGood:'Hopp! Super gesprungen!',
       tunnelGood:'Durch den Tunnel – juhu!',slalomGood:'Slalom geschafft!',rampGood:'Rauf und runter – toll!',
       courseProg:'{d} von 4 geschafft!',courseDone:'Ganzer Parcours geschafft! +{m} und Herzen!',
@@ -737,7 +800,7 @@ function dog(o,wear){
       [[-24,-10,6],[0,6,7],[22,-12,5],[36,10,6],[-8,-20,4],[14,18,4],[-34,8,5]].map(([a,b,r])=>`<circle cx="${cx+a}" cy="${cy+b}" r="${r}"/>`).join('')+'</g>';
     s+=`<circle cx="${lx[0]}" cy="${lt+lh*.55}" r="3.5" fill="#2b2430"/><circle cx="${lx[2]}" cy="${lt+lh*.4}" r="3" fill="#2b2430"/>`;
   }
-  const geo={hx,hy,hr,ex:12,ey:hy-4,cx,cy,len,ry};
+  const geo={hx,hy,hr,ex:12,ey:hy-4,cx,cy,len,ry,ny:hy+7};
   if(wear&&wear.body) s+=wearBody(wear.body,geo,id);
   // уши, которые стоят (рисуем до головы)
   const ec=o.earC||c;
@@ -824,7 +887,7 @@ function cat(o,wear){
   if(o.calico) bp+=`<circle cx="${cx-12}" cy="${cy-14}" r="16" fill="#f39a3f"/><circle cx="${cx+30}" cy="${cy+4}" r="14" fill="#f39a3f"/><circle cx="${cx+8}" cy="${cy-2}" r="11" fill="#2e2838"/>`;
   if(o.chest) bp+=`<ellipse cx="${cx-len+10}" cy="${cy+8}" rx="18" ry="16" fill="${o.chest}"/>`;
   if(bp) s+=`<clipPath id="${id}b"><ellipse cx="${cx}" cy="${cy}" rx="${len}" ry="${ry}"/></clipPath><g clip-path="url(#${id}b)">${bp}</g>`;
-  const geo={hx,hy,hr:28,ex:11,ey:hy+1,cx,cy,len,ry};
+  const geo={hx,hy,hr:28,ex:11,ey:hy+1,cx,cy,len,ry,ny:hy+12};
   if(wear&&wear.body) s+=wearBody(wear.body,geo,id);
   // уши
   const ec=pt||c;
@@ -975,14 +1038,14 @@ function wishSnd(){ if(!ac()) return; const t=AC.currentTime+.01; sweep(700,1000
    ===================================================================== */
 const $ = id => document.getElementById(id);
 const state = {avatar:0, pet:null, name:'', money:10000, happy:60,
-  cons:{food:0,water:0,treat:0,shampoo:0}, items:null, clothes:[], wear:{head:null,eyes:null,body:null,neck:null}, nextU:10, lastPlace:'home', petCity:true, sick:false, cares:0, clock:.1, photos:[], dirty:false, walk:false};
+  cons:{food:0,water:0,treat:0,shampoo:0}, items:null, clothes:[], wear:{head:null,eyes:null,body:null,neck:null}, nextU:10, lastPlace:'home', petCity:true, sick:false, cares:0, clock:.1, photos:[], dirty:false, walk:false, seasonPick:'auto', eggs:{day:'',got:[]}, advent:{year:0,bought:false,opened:[]}};
 let current='s-title', timers=[];
 function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
 const tn = k => t(k).replace(/\{name\}/g, state.name);
 function save(){
   try{ localStorage.setItem('kpopPets', JSON.stringify({lang, avatar:state.avatar, pet:state.pet, name:state.name,
        money:state.money, happy:state.happy, lastSeen:Date.now(),
-       cons:state.cons, items:state.items, clothes:state.clothes, wear:state.wear, nextU:state.nextU, lastPlace:state.lastPlace, petCity:state.petCity, sick:state.sick, cares:state.cares, clock:state.clock, photos:state.photos, muted:muted, dirty:state.dirty})); }catch(e){}
+       cons:state.cons, items:state.items, clothes:state.clothes, wear:state.wear, nextU:state.nextU, lastPlace:state.lastPlace, petCity:state.petCity, sick:state.sick, cares:state.cares, clock:state.clock, photos:state.photos, muted:muted, dirty:state.dirty, seasonPick:state.seasonPick, eggs:state.eggs, advent:state.advent})); }catch(e){}
 }
 function load(){
   try{
@@ -1006,12 +1069,16 @@ function load(){
     if(Array.isArray(d.clothes)) state.clothes=[...new Set(d.clothes.filter(id=>CATALOG[id] && CATALOG[id].t==='wear'))];
     if(d.wear) for(const k in state.wear){ const id=d.wear[k]; if(id && state.clothes.includes(id) && CATALOG[id].slot===k) state.wear[k]=id; }
     if(Number.isInteger(d.nextU)) state.nextU=d.nextU;
-    if(['home','dogs','cats','shopP','shopS','vet','park'].includes(d.lastPlace)) state.lastPlace=d.lastPlace;
+    if(['home','dogs','cats','shopP','shopS','vet','park','doener','cafe'].includes(d.lastPlace)) state.lastPlace=d.lastPlace;
     if(d.sick===true && state.pet) state.sick=true;
     if(Number.isInteger(d.cares) && d.cares>=0) state.cares=d.cares;
     if(typeof d.clock==='number' && d.clock>=0 && d.clock<1) state.clock=d.clock;
     if(d.muted===true) muted=true;
     if(d.dirty===true) state.dirty=true;
+    if(['auto','spring','summer','autumn','winter','xmas','easter'].includes(d.seasonPick)) state.seasonPick=d.seasonPick;
+    if(d.eggs && typeof d.eggs.day==='string' && Array.isArray(d.eggs.got)) state.eggs={day:d.eggs.day.slice(0,10), got:d.eggs.got.filter(n=>Number.isInteger(n)&&n>=0&&n<20)};
+    if(d.advent && Number.isInteger(d.advent.year) && Array.isArray(d.advent.opened))
+      state.advent={year:d.advent.year, bought:d.advent.bought===true, opened:d.advent.opened.filter(n=>Number.isInteger(n)&&n>=1&&n<=24)};
     if(Array.isArray(d.photos)) state.photos=d.photos.filter(ph=>ph && ph.p && ((ph.p.type==='dog'&&ph.p.i>=0&&ph.p.i<DOGS.length)||(ph.p.type==='cat'&&ph.p.i>=0&&ph.p.i<CATS.length))
         && typeof ph.n==='string' && typeof ph.ts==='number').slice(-40).map(ph=>({p:{type:ph.p.type,i:ph.p.i|0},
         w:Object.fromEntries(['head','eyes','body','neck'].map(k=>[k, ph.w && CATALOG[ph.w[k]] && CATALOG[ph.w[k]].slot===k ? ph.w[k] : null])),
@@ -1041,6 +1108,7 @@ function applyLang(){
   document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
   $('nameInput').placeholder=t('namePh');
   $('langs').innerHTML=Object.keys(T).map(k=>`<button class="lang${k===lang?' on':''}" data-lang="${k}">${FLAGS[k]}${k.toUpperCase()}</button>`).join('');
+  if(typeof renderSeasons==='function') renderSeasons();
   renderAvatars();
 }
 
@@ -1308,6 +1376,9 @@ function wearBody(id,g,uid){
 }
 function wearNeck(id,g){
   const v=PAL[vOf(id)], y=g.hy+g.hr*.78;
+  if(id.startsWith('scarf')) return `<path d="M${g.hx-g.hr*.72},${y-6} Q${g.hx},${y+g.hr*.3} ${g.hx+g.hr*.72},${y-6}" stroke="#ff4f6d" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M${g.hx-g.hr*.72},${y-6} Q${g.hx},${y+g.hr*.3} ${g.hx+g.hr*.72},${y-6}" stroke="#fff" stroke-width="9" fill="none" stroke-dasharray="4 6"/>
+    <rect x="${g.hx+g.hr*.25}" y="${y}" width="9" height="20" rx="3" fill="#ff4f6d"/><path d="M${g.hx+g.hr*.25},${y+20} v4 M${g.hx+g.hr*.25+4.5},${y+20} v4 M${g.hx+g.hr*.25+9},${y+20} v4" stroke="#fff" stroke-width="2"/>`;
   return `<path d="M${g.hx-g.hr*.68},${y-4} Q${g.hx},${y+g.hr*.32} ${g.hx+g.hr*.68},${y-4}" stroke="${v.main}" stroke-width="6" fill="none" stroke-linecap="round"/>`+
     (vOf(id)==='p' ? heart(g.hx,y+g.hr*.12+6,.8,'#ffd84d') : star(g.hx,y+g.hr*.12+6,6,'#ffd84d'));
 }
@@ -1321,6 +1392,16 @@ function wearEyes(id,g){
 }
 function wearHead(id,g){
   const v=PAL[vOf(id)], hx=g.hx, top=g.hy-g.hr;
+  if(id.startsWith('xhat')){
+    const r=g.hr;
+    return `<path d="M${hx-r*.66},${top+7} L${hx+r*.62},${top+7} Q${hx+r*.7},${top-16} ${hx+r*.95},${top-22} Q${hx+r*.2},${top-24} ${hx-r*.66},${top+7}Z" fill="#ff4f6d"/>
+      <rect x="${hx-r*.75}" y="${top+2}" width="${r*1.5}" height="8" rx="4" fill="#fff"/><circle cx="${hx+r*.95}" cy="${top-22}" r="5.5" fill="#fff"/>`;
+  }
+  if(id.startsWith('antlers')){
+    const L=`M-10,4 L-15,-16 M-14,-10 L-23,-15 M-15,-17 L-11,-25 M-13,-4 L-21,-6`;
+    return `<g transform="translate(${hx} ${top+2})"><path d="${L}" stroke="#b07a5a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="${L}" transform="scale(-1 1)" stroke="#b07a5a" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M-12,4 Q0,-2 12,4" stroke="#7b3fe0" stroke-width="4" fill="none" stroke-linecap="round"/></g><circle cx="${hx}" cy="${g.ny||g.hy+7}" r="5" fill="#ff3355"/><circle cx="${hx-1.5}" cy="${(g.ny||g.hy+7)-1.5}" r="1.5" fill="#fff"/>`;
+  }
   if(id.startsWith('bow')){
     const bx=hx+g.hr*.55, by=g.hy-g.hr*.78;
     return `<g transform="translate(${bx} ${by}) rotate(15)"><path d="M0,0 L-15,-10 L-15,10Z M0,0 L15,-10 L15,10Z" fill="${v.main}" stroke="${v.dark}" stroke-width="2" stroke-linejoin="round"/><circle r="4.5" fill="${v.dark}"/></g>`;
@@ -1412,6 +1493,9 @@ function mirrorSvg(v){
 }
 
 const NAMES = {
+  xhat:{de:'Weihnachtsmütze',ru:'Новогодняя шапка',ro:'Căciulă de Crăciun'}, antlers:{de:'Rentier-Geweih',ru:'Оленьи рожки',ro:'Coarne de ren'},
+  scarf:{de:'Schal',ru:'Шарф',ro:'Fular'}, xtree:{de:'Mini-Weihnachtsbaum',ru:'Ёлочка',ro:'Brăduț'}, xstar:{de:'Weihnachtsstern',ru:'Рождественская звезда',ro:'Steaua de Crăciun'},
+  gifts:{de:'Geschenke',ru:'Подарки',ro:'Cadouri'}, advent:{de:'Adventskalender',ru:'Адвент-календарь',ro:'Calendar de Advent'},
   food:{de:'Futter',ru:'Корм',ro:'Mâncare'}, water:{de:'Wasser',ru:'Вода',ro:'Apă'}, treat:{de:'Leckerli',ru:'Лакомство',ro:'Recompensă'},
   shampoo:{de:'Shampoo',ru:'Шампунь',ro:'Șampon'}, toy:{de:'Spielzeug',ru:'Игрушка',ro:'Jucărie'}, ball:{de:'Ball',ru:'Мячик',ro:'Minge'},
   basket:{de:'Körbchen',ru:'Лежанка',ro:'Culcuș'}, collar:{de:'Halsband',ru:'Ошейник',ro:'Zgardă'}, bow:{de:'Schleife',ru:'Бантик',ro:'Fundiță'},
@@ -1428,6 +1512,14 @@ const CATALOG = {
   rug_d:{t:'place',place:'rug',w:32,svg:()=>SVG_RUG}, poster_d:{t:'place',place:'wall',w:9,svg:()=>SVG_POSTER},
   mirror_d:{t:'place',place:'wall',w:10,svg:()=>SVG_MIRROR}
 };
+Object.assign(CATALOG,{
+  xhat_c:{t:'wear',slot:'head',svg:()=>wearIcon('xhat_c','-28 -60 64 48')},
+  antlers_c:{t:'wear',slot:'head',svg:()=>`<svg viewBox="-34 -36 68 56">${wearHead('antlers_c',{hx:0,hy:0,hr:10,ny:14})}</svg>`},
+  scarf_c:{t:'wear',slot:'neck',svg:()=>`<svg viewBox="-30 -8 60 52">${wearNeck('scarf_c',{hx:0,hy:-10,hr:32})}</svg>`},
+  xtree_c:{t:'place',place:'floor',w:7,svg:()=>xtreeSvg()},
+  xstar_c:{t:'place',place:'wall',w:6,svg:()=>xstarSvg()},
+  gifts_c:{t:'place',place:'floor',w:9,svg:()=>giftsSvg()}
+});
 for(const v of ['p','s']){
   Object.assign(CATALOG,{
     ['toy_'+v]:{t:'place',place:'floor',w:5,kind:'play',svg:()=>plushSvg(v)},
@@ -1516,7 +1608,7 @@ function mkEnt(svg,w,isPet){
 function buildHouse(){
   const h=$('house');
   h.innerHTML=`<div class="floor"></div><div class="floor2"></div><div class="wl" style="left:30%"></div><div class="wl" style="left:68%"></div>`+
-    itemHtml(14,58,12,SVG_WINDOW,null,null,1)+
+    itemHtml(14,58,12,SVG_WINDOW,null,null,1)+(adventActive()?itemHtml(24.5,60,7,calendarSvg(),'advent','calItem',2):'')+
     itemHtml(14,18,24,SVG_BED,'sleep')+itemHtml(63,30,7,SVG_DOOR,'door',null,3)+
     itemHtml(28,5,7,SVG_TOY,'play')+itemHtml(75,2,11,pottySvg(),'potty','pottyItem')+
     state.items.filter(i=>i.x!=null).map(placedHtml).join('')+
@@ -1794,7 +1886,7 @@ $('house').addEventListener('pointerdown',e=>{
     try{ $('house').setPointerCapture(e.pointerId); }catch(err){}
     return;
   }
-  if(tap){ if(tap.dataset.kind==='door'){ pop(); goCity('home'); } else useItem(tap.dataset.kind,tap); return; }
+  if(tap){ if(tap.dataset.kind==='advent'){ pop(); openCalendar(); return; } if(tap.dataset.kind==='door'){ pop(); goCity('home'); } else useItem(tap.dataset.kind,tap); return; }
   const [x,y]=housePoint(e); const [cx,cy]=clampFloor(x,y);
   goTo(HM.av,cx,cy);
 });
@@ -1982,10 +2074,10 @@ const CN={}, CE=[];
 function nid(x,y){ const id=x+','+y; if(!CN[id]) CN[id]={id,x,y,adj:[]}; return id; }
 function edge(a,b,type){ const e={a:nid(a[0],a[1]),b:nid(b[0],b[1]),type:type||'all'}; CE.push(e); CN[e.a].adj.push(e); CN[e.b].adj.push(e); }
 function row(y,xs,tf){ for(let i=0;i<xs.length-1;i++) edge([xs[i],y],[xs[i+1],y],tf?tf(xs[i],xs[i+1]):'all'); }
-row(48,[8,30,44,60,90,112,138,150,156,164,174],(a,b)=>a===112&&b===138?'ped':'all');   // Hauptstraße, Krämerbrücke nur zu Fuß
+row(48,[8,22,30,44,60,90,103,112,138,150,156,164,174],(a,b)=>a===112&&b===138?'ped':'all');   // Hauptstraße, Krämerbrücke nur zu Fuß
 row(86,[8,30,52,60,75,90,101,112,138,156,168,174]);                                      // untere Straße mit Straßenbahn
-row(26,[30,60]);                                                                     // Domplatz
-edge([8,48],[8,86]); edge([30,26],[30,48],'ped'); edge([60,26],[60,48]); edge([60,48],[60,86]);
+row(26,[30,45,60]);                                                                     // Domplatz
+edge([8,48],[8,86]); edge([30,26],[30,48],'ped'); edge([60,26],[60,48]); edge([60,48],[60,66]); edge([60,66],[60,86]);
 edge([90,48],[90,86]); edge([138,48],[138,86]); edge([174,48],[174,86]);
 edge([-12,48],[8,48],'veh'); edge([-12,86],[8,86],'veh'); edge([174,48],[192,48],'veh'); edge([174,86],[192,86],'veh');
 const SPAWNS=['-12,48','-12,86','192,48','192,86'];
@@ -2033,9 +2125,12 @@ const PLACES = {
   shopP:{x:150,base:46,w:20,node:[150,48],svg:()=>shopFrontSvg('p'),label:()=>t('shopP')},
   shopS:{x:156,base:84,w:20,node:[156,86],svg:()=>shopFrontSvg('s'),label:()=>t('shopS')},
   vet:  {x:101,base:84,w:17,node:[101,86],svg:()=>vetSvg(),         label:()=>t('vet')},
-  park: {x:156,base:62,w:14,node:[156,48],svg:()=>parkSvg(),        label:()=>t('park')}
+  park: {x:156,base:62,w:14,node:[156,48],svg:()=>parkSvg(),        label:()=>t('park')},
+  doener:{x:51,base:70,w:11,node:[60,66],svg:()=>doenerSvg(),       label:()=>t('doener')},
+  cafe: {x:103,base:64,w:12,node:[103,48],svg:()=>cafeSvg(),        label:()=>t('cafe')},
+  market:{x:45,base:46,w:26,node:[44,48],svg:()=>marketSvg(),       label:()=>t('market'), season:'xmas'}
 };
-const STOPS = [{type:'bus',x:44,y:48},{type:'bus',x:164,y:48}];
+const STOPS = [{type:'bus',x:22,y:48},{type:'bus',x:164,y:48}];
 const TAXI_PRICE = 20;
 
 /* --- Fahrzeuge --- */
@@ -2085,6 +2180,7 @@ const tree=(x,y,s)=>`<rect x="${x-.5*s}" y="${y-2.5*s}" width="${s}" height="${2
 const lamp=(x,y,d)=>`<rect x="${x-.25}" y="${y-6}" width=".5" height="6" fill="#9b5cff"/><circle cx="${x}" cy="${y-6.4}" r="2" fill="#fff6b0" opacity=".55" class="tw" style="animation-delay:${d}s"/><circle cx="${x}" cy="${y-6.4}" r=".9" fill="#ffd84d"/>`;
 const stall=(x,b)=>`<rect x="${x-3}" y="${b-4}" width="6" height="4" fill="#fff"/><polygon points="${x-3.8},${b-4} ${x+3.8},${b-4} ${x+3},${b-6.5} ${x-3},${b-6.5}" fill="#ff7ac0"/><path d="M${x-1.3},${b-6.5} L${x-1.5},${b-4} M${x+1.3},${b-6.5} L${x+1.5},${b-4}" stroke="#fff" stroke-width=".8"/><circle cx="${x-1}" cy="${b-1.5}" r=".8" fill="#ff4fa8"/><circle cx="${x+1}" cy="${b-1.5}" r=".8" fill="#ffd84d"/>`;
 let CITY_SVG=null;
+const CITY_TREE_LIST=[[6,44,.8],[14,64,.9],[70,44,.8],[176,66,.7],[12,99,.7],[40,99,.6],[66,99,.7],[96,99,.6],[148,99,.7],[172,99,.6]];
 const LAMP_POS=[[20,44],[56,44],[104,44],[146,44.5],[170,44.5],[42,83],[66,83.5],[88,83.5],[146,83.5]];
 function citySvg(){
   if(CITY_SVG) return CITY_SVG;
@@ -2124,7 +2220,7 @@ function citySvg(){
   for(let i=0;i<6;i++) s+=fachHouse(113.6+i*4.6,60,4.4,5.5,WALLS[(i+4)%6],ROOFS[(i+1)%4],false);
   // Markt, Bäume, Laternen, Glitzer
   s+=stall(37,42)+stall(53,42);
-  for(const [x,y,k] of [[6,44,.8],[14,64,.9],[48,64,.8],[70,44,.8],[105,62,.6],[176,66,.7],[12,99,.7],[40,99,.6],[66,99,.7],[96,99,.6],[148,99,.7],[172,99,.6]]) s+=tree(x,y,k);
+  for(const [x,y,k] of CITY_TREE_LIST) s+=tree(x,y,k);
   LAMP_POS.forEach(([x,y],i)=>{ s+=lamp(x,y,(i*.37)%1.8); });
   for(let i=0;i<22;i++){ const x=(i*47.3)%178+1, y=(i*29.7)%96+2; s+=star(x,y,.7+(i%3)*.3,i%2?'#fff':'#ffd84d',`class="tw" style="animation-delay:${(i%7)*.25}s"`); }
   s=s.replace(/ class="tw"/g,'');
@@ -2158,7 +2254,7 @@ function fitCity(){
 }
 function setCityHint(txt){ const h=$('cityHint'); if(!h) return; h.textContent=txt; h.classList.remove('pop'); void h.offsetWidth; h.classList.add('pop'); }
 function placeFromScreen(){
-  return {'s-dogs':'dogs','s-cats':'cats','s-home':'home','s-shop':shopId==='p'?'shopP':'shopS','s-vet':'vet','s-park':'park'}[current] || null;
+  return {'s-dogs':'dogs','s-cats':'cats','s-home':'home','s-shop':shopId==='p'?'shopP':'shopS','s-vet':'vet','s-park':'park','s-snack':snackId}[current] || null;
 }
 const SKINS=['#ffd9b8','#c98b5a','#f1c08f','#8d5a3b','#ffe0c7','#f6cba0'], TOPS=['#7ad7ff','#ffcc33','#9b5cff','#ff7ac0','#5fd6a8','#ff9f5a'];
 const PED_NODES = () => Object.keys(CN).filter(k=>CN[k].adj.some(e=>okE(e,'ped')));
@@ -2177,10 +2273,11 @@ function buildCity(){
   let h=`<div class="cbg">${citySvg()}</div>
     <div class="chit" data-hit="dom" style="left:${12/1.8}%;top:0;width:${36/1.8}%;height:29%"></div>
     <div class="chit" data-hit="bridge" style="left:${111/1.8}%;top:37%;width:${28/1.8}%;height:24%"></div>`;
-  for(const k in PLACES){ const p=PLACES[k];
+  for(const k of placeKeys()){ const p=PLACES[k];
     h+=`<div class="cobj cbld" data-place="${k}" style="left:${p.x/1.8}%;top:${p.base}%;width:${p.w/1.8}%;z-index:${p.base*10}">${p.svg()}<div class="lbl clbl">${p.label()}</div></div>`; }
   STOPS.forEach((s,i)=>{ h+=`<div class="cobj cstop" data-stop="${i}" style="left:${(s.x+3)/1.8}%;top:${s.y-3}%;width:${6/1.8}%;z-index:${(s.y-3)*10}">${stopSvg(s.type)}</div>`; });
   TRAM_LINES.forEach(L=>L.stops.forEach(([x,y],j)=>{ h+=`<div class="cobj cstop" data-tstop="${L.id}:${j}" style="left:${(x+3)/1.8}%;top:${y-3}%;width:${6/1.8}%;z-index:${Math.round((y-3)*10)}">${stopSvg('tram',L.color)}</div>`; }));
+  h+=seasonCityHtml();
   h+=`<svg class="leashLayer" viewBox="0 0 180 100" preserveAspectRatio="none"><path id="cLeash" d="" stroke="#ff4fa8" stroke-width="3" vector-effect="non-scaling-stroke" fill="none" stroke-linecap="round"/></svg>`;
   for(const [x,y] of [[30,15],[17.5,1.5],[42.5,1.5],[120,10],[127,32],[123,70],[20,38],[70,38],[104,38],[146,38],[66,77],[146,77],[150,12],[90,10]])
     h+=`<div class="cspk" style="left:${x/1.8}%;top:${y}%;animation-delay:${((x*7+y)%26)/10}s"><svg viewBox="0 0 20 20"><path d="M10,0 Q11,9 20,10 Q11,11 10,20 Q9,11 0,10 Q9,9 10,0Z" fill="#fff6b0"/></svg></div>`;
@@ -2239,6 +2336,7 @@ function cityLoop(now){
   for(const c of CT.cars){ if(c.path) stepPath(c,dt); else { c.wait-=dt; if(c.wait<=0) carNext(c); } c.flip.style.transform=c.dir<0?'scaleX(-1)':'none'; cPos(c); }
   for(const v of CT.vehs){ stepPath(v,dt); v.flip.style.transform=v.dir<0?'scaleX(-1)':'none'; cPos(v); }
   for(const L of TRAM_LINES) if(L.tram) tramStep(L,dt);
+  seasonCityStep(dt);
   cityLeash();
   if(walkDog() && !CT.pottyDone && !CT.busy){ CT.pottyT-=dt; if(CT.pottyT<=0) startCityPotty(); }
   if(CT.spot && now-CT.spot.nag>30000){ CT.spot.nag=now; changeHappy(-3); setCityHint(t('cleanPlease')); }
@@ -2257,13 +2355,15 @@ function enterPlace(id){
     if(state.petCity===false){ toast(t('bringPet')); nope(); return; }
   }
   if(id==='home') goHome(); else if(id==='dogs') goDogs(); else if(id==='cats') goCats();
-  else if(id==='vet') goVet(); else if(id==='park') goPark(); else goShop(id==='shopP'?'p':'s');
+  else if(id==='vet') goVet(); else if(id==='park') goPark();
+  else if(id==='doener'||id==='cafe'||id==='market') goSnack(id); else goShop(id==='shopP'?'p':'s');
 }
 function horn(){ if(!ac()) return; const t=AC.currentTime+.01; for(const d of [0,.22]){ tone(440,t+d,.15,'square',.06); tone(554,t+d,.15,'square',.06); } }
 function bells(){ if(!ac()) return; const t=AC.currentTime+.01; [523,392,440,330].forEach((f,i)=>{ tone(f,t+i*.5,1.4,'sine',.2); tone(f*2.01,t+i*.5,.8,'sine',.05); }); }
 $('city').addEventListener('pointerdown',e=>{
   if(current!=='s-city' || CT.busy) return;
   ac();
+  const egg=hitAt(e,'[data-egg]'); if(egg){ findEgg(egg); return; }
   const st=e.target.closest('[data-stop]'), hit=e.target.closest('[data-hit]');
   const cl=hitAt(e,'[data-clean]'), ts=hitAt(e,'[data-tstop]'), tm=hitAt(e,'[data-tram]');
   const b=(ts||st)?null:e.target.closest('[data-place]');
@@ -2278,13 +2378,13 @@ $('city').addEventListener('pointerdown',e=>{
 });
 function nearestPlace(){
   let best=null,bd=4;
-  for(const k in PLACES){ const n=PLACES[k].node, d=Math.hypot(n[0]-CT.av.x,n[1]-CT.av.y); if(d<bd){ bd=d; best=k; } }
+  for(const k of placeKeys()){ const n=PLACES[k].node, d=Math.hypot(n[0]-CT.av.x,n[1]-CT.av.y); if(d<bd){ bd=d; best=k; } }
   return best;
 }
 function openDest(mode){
   if(CT.busy && !(mode==='taxi' && CT.busy==='taxiWait') && !(mode==='tram' && CT.busy==='tramWait')) return;
   const here = (mode==='taxi'||mode==='tram') ? null : nearestPlace();
-  const btns=Object.keys(PLACES).filter(k=>k!==here).map(k=>`<button class="shopBtn destBtn" data-dest="${k}" data-mode="${mode}">${PLACES[k].svg()}<div class="lbl">${PLACES[k].label()}</div></button>`).join('');
+  const btns=placeKeys().filter(k=>k!==here).map(k=>`<button class="shopBtn destBtn" data-dest="${k}" data-mode="${mode}">${PLACES[k].svg()}<div class="lbl">${PLACES[k].label()}</div></button>`).join('');
   openSheet(`<div class="bagHead" style="font-size:clamp(18px,3.8vmin,32px)"><span style="width:3.2em;display:inline-block">${VEH[mode].svg()}</span><span>${t('whereTo')}</span></div>`+
     (mode==='taxi'?`<div class="mq small"><span class="spr">${COIN}${fmtMoney(TAXI_PRICE)}</span></div>`:'<div class="mq small"></div>')+
     `<div class="destGrid">${btns}</div><div class="row" style="margin-top:2vmin"><button class="pill ghost" data-close>${t('back')}</button></div>`);
@@ -2485,7 +2585,7 @@ function applyDay(){
   const g=Math.min(1,d*1.5).toFixed(2);
   document.querySelectorAll('.lglow').forEach(el=>el.style.opacity=g);
 }
-const WORLD=['s-home','s-city','s-park','s-vet','s-shop','s-game','s-album','s-dogs','s-cats'];
+const WORLD=['s-snack','s-home','s-city','s-park','s-vet','s-shop','s-game','s-album','s-dogs','s-cats'];
 setInterval(()=>{
   if(document.hidden || !WORLD.includes(current)) return;
   state.clock=(state.clock+1/DAY_LEN)%1;
@@ -2990,7 +3090,7 @@ function hitAt(e,sel){ if(!document.elementsFromPoint) return e.target.closest(s
 const walkDog=()=>state.walk && state.pet && state.pet.type==='dog' && state.petCity!==false;
 
 /* Gassi in der Stadt */
-const CITY_TREES=[[14,64],[48,64],[70,44],[105,62],[12,99],[40,99],[66,99],[96,99],[148,99]];
+const CITY_TREES=[[14,64],[70,44],[12,99],[40,99],[66,99],[96,99],[148,99]];
 function cityLeash(){
   const path=$('cLeash'); if(!path) return;
   const p=CT.pet, a=CT.av;
@@ -3165,6 +3265,256 @@ function arriveTram(L){
   const D=PLACES[r.dest];
   later(()=>cityWalkTo(D.node[0],D.node[1],()=>walkInto(r.dest)),400);
 }
+
+/* =====================================================================
+   DÖNER, CAFÉ, JAHRESZEITEN UND ADVENTSKALENDER
+   ===================================================================== */
+/* --- Jahreszeit nach echtem Datum --- */
+function easterSunday(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;
+  return new Date(y,mo-1,da);
+}
+function firstAdvent(y){ const x=new Date(y,11,25), w=x.getDay(); return new Date(y,11,25-(w===0?7:w)-21); }
+function autoSeason(now){
+  now=now||new Date(); const y=now.getFullYear(), day=new Date(y,now.getMonth(),now.getDate());
+  if(day>=firstAdvent(y) || (now.getMonth()===0 && now.getDate()<=6)) return 'xmas';
+  const es=easterSunday(y), from=new Date(es.getTime()-13*864e5), to=new Date(es.getTime()+7*864e5);
+  if(day>=from && day<=to) return 'easter';
+  const m=now.getMonth();
+  return m>=2&&m<=4?'spring' : m>=5&&m<=7?'summer' : m>=8&&m<=10?'autumn' : 'winter';
+}
+const season = () => state.seasonPick==='auto' ? autoSeason() : state.seasonPick;
+const placeKeys = () => Object.keys(PLACES).filter(k=>!PLACES[k].season || PLACES[k].season===season());
+const SEASON_KEYS=['auto','spring','summer','autumn','winter','xmas','easter'];
+const SEASON_T={auto:'sAuto',spring:'sSpring',summer:'sSummer',autumn:'sAutumn',winter:'sWinter',xmas:'sXmas',easter:'sEaster'};
+function renderSeasons(){
+  const el=$('seasons'); if(!el) return;
+  el.innerHTML=`<span class="seasonLbl">${t('season')}:</span>`+SEASON_KEYS.map(k=>`<button class="lang${state.seasonPick===k?' on':''}" data-season="${k}">${t(SEASON_T[k])}</button>`).join('');
+}
+$('seasons').addEventListener('click',e=>{ const b=e.target.closest('[data-season]'); if(!b) return; state.seasonPick=b.dataset.season; pop(); renderSeasons(); save(); });
+
+/* --- Deko je Jahreszeit in der Stadt --- */
+const EGG_POS=[[10,94],[30,96],[52,94],[84,96],[108,95],[158,95],[16,72],[47,58],[83,58],[176,58]];
+const todayKey=()=>{ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
+function eggSvg(i){
+  const c=['#ff7ac0','#7ad7ff','#ffd84d','#9ff0cf','#c9a7ff'][i%5], c2=['#fff','#ff7ac0','#9b5cff','#fff','#ffd84d'][i%5];
+  return `<svg viewBox="0 0 30 38"><ellipse cx="15" cy="21" rx="12" ry="15" fill="${c}" stroke="#fff" stroke-width="2"/><path d="M4,18 Q9,14 15,18 Q21,22 26,18" stroke="${c2}" stroke-width="3" fill="none"/><circle cx="10" cy="27" r="2" fill="${c2}"/><circle cx="20" cy="27" r="2" fill="${c2}"/></svg>`;
+}
+function seasonCityHtml(){
+  const se=season(); let svg='', html='';
+  const crowns=CITY_TREE_LIST.map(([x,y,k])=>[x,y-4*k,3*k]);
+  if(se==='spring'||se==='easter'){
+    for(const [x,y,r] of crowns) svg+=`<circle cx="${x-r*.5}" cy="${y-r*.3}" r="${r*.28}" fill="#ffb3dc"/><circle cx="${x+r*.4}" cy="${y+r*.2}" r="${r*.25}" fill="#fff"/><circle cx="${x+r*.1}" cy="${y-r*.7}" r="${r*.22}" fill="#ffb3dc"/>`;
+    for(let i=0;i<34;i++){ const x=(i*29.3)%176+2, y=91+(i*7.7)%8; svg+=`<circle cx="${x}" cy="${y}" r=".9" fill="${['#ff7ac0','#ffd84d','#fff','#c9a7ff'][i%4]}"/><circle cx="${x}" cy="${y}" r=".35" fill="#ffd84d"/>`; }
+    for(let i=0;i<3;i++) html+=`<div class="bfly" style="left:${20+i*28}%;top:${55+i*8}%;animation-delay:${i*1.3}s"><svg viewBox="0 0 20 16"><ellipse cx="6" cy="6" rx="5" ry="5" fill="${['#ff9fd2','#c9a7ff','#ffd84d'][i]}"/><ellipse cx="14" cy="6" rx="5" ry="5" fill="${['#ff9fd2','#c9a7ff','#ffd84d'][i]}"/><ellipse cx="7" cy="12" rx="3.5" ry="3" fill="#fff"/><ellipse cx="13" cy="12" rx="3.5" ry="3" fill="#fff"/><rect x="9.3" y="3" width="1.4" height="11" rx=".7" fill="#4a1f7a"/></svg></div>`;
+  }
+  if(se==='summer'){
+    svg+=`<circle cx="172" cy="6" r="9" fill="#ffd84d" opacity=".25"/><circle cx="172" cy="6" r="5.5" fill="#ffd84d"/><rect x="0" y="90" width="180" height="10" fill="#8ce8b0" opacity=".55"/>`;
+    for(let i=0;i<26;i++){ const x=(i*31.7)%176+2, y=91+(i*6.3)%8; svg+=`<circle cx="${x}" cy="${y}" r=".8" fill="${['#ff4f6d','#ffd84d','#ff9f5a'][i%3]}"/>`; }
+  }
+  if(se==='autumn'){
+    for(const [x,y,r] of crowns) svg+=`<circle cx="${x}" cy="${y}" r="${r}" fill="#ffb347" opacity=".75"/><circle cx="${x+r*.4}" cy="${y-r*.3}" r="${r*.55}" fill="#ff7a5c" opacity=".7"/>`;
+    svg+=`<rect x="0" y="90" width="180" height="10" fill="#f6d2a0" opacity=".5"/>`;
+    for(let i=0;i<10;i++) html+=`<div class="leaf" style="left:${(i*9.7)%96}%;animation-delay:${(i*.9)%7}s;animation-duration:${6+(i%4)}s"><svg viewBox="0 0 10 10"><path d="M5,0 Q10,5 5,10 Q0,5 5,0Z" fill="${['#ff7a5c','#ffb347','#ffd84d'][i%3]}"/></svg></div>`;
+  }
+  if(se==='winter'||se==='xmas'){
+    for(const [x,y,r] of crowns) svg+=`<ellipse cx="${x}" cy="${y-r*.55}" rx="${r*.85}" ry="${r*.45}" fill="#fff"/>`;
+    svg+=`<rect x="0" y="90" width="180" height="10" fill="#fff" opacity=".85"/><path d="M12.5,7.5 L17.5,-1 L22.5,7.5Z M37.5,7.5 L42.5,-1 L47.5,7.5Z" fill="#fff" opacity=".0"/><polygon points="21,10.5 30,3.5 39,10.5 35,9 30,6 25,9" fill="#fff"/>`;
+    for(let i=0;i<30;i++) html+=`<div class="flake" style="left:${(i*3.37)%99}%;animation-delay:${(i*.53)%8}s;animation-duration:${6+(i%5)}s;width:${4+(i%3)*2}px;height:${4+(i%3)*2}px"></div>`;
+  }
+  if(se==='xmas'){
+    const cols=['#ff4f6d','#ffd84d','#7ad7ff','#9ff0cf','#ff9fd2'];
+    for(let i=0;i<40;i++){ const x=4+i*4.4; svg+=`<circle cx="${x}" cy="${43.2+Math.sin(i*.8)*.6}" r=".7" fill="${cols[i%5]}"/>`; }
+    svg+=`<path d="M4,43 ${Array.from({length:40},(_,i)=>`L${4+i*4.4},${43.2+Math.sin(i*.8)*.6}`).join(' ')}" stroke="#3fbf8f" stroke-width=".3" fill="none"/>`;
+  }
+  if(se==='easter'){
+    const got=state.eggs.day===todayKey()?state.eggs.got:[];
+    EGG_POS.forEach(([x,y],i)=>{ if(!got.includes(i)) html+=`<div class="cobj cegg" data-egg="${i}" style="left:${x/1.8}%;top:${y}%;width:${3/1.8}%;z-index:${Math.round(y*10)+1}">${eggSvg(i)}</div>`; });
+    html+=`<div class="cobj" style="left:${45/1.8}%;top:46%;width:${15/1.8}%;z-index:455;pointer-events:none">${carouselSvg()}</div>`;
+    html+=`<div class="cobj cbunny" id="cBunny" style="left:${36/1.8}%;top:44%;width:${5/1.8}%;z-index:440;pointer-events:none"><div class="flip">${bunnySvg()}</div></div>`;
+  }
+  return `<svg class="seasonLayer" viewBox="0 0 180 100" preserveAspectRatio="none">${svg}</svg>`+html;
+}
+let bunnyX=36, bunnyDir=1;
+function seasonCityStep(dt){
+  const b=$('cBunny'); if(!b) return;
+  bunnyX+=bunnyDir*5*dt; if(bunnyX>58){ bunnyX=58; bunnyDir=-1; } if(bunnyX<32){ bunnyX=32; bunnyDir=1; }
+  b.style.left=(bunnyX/1.8)+'%'; b.classList.add('walking'); b.firstChild.style.transform=bunnyDir>0?'scaleX(-1)':'none';
+}
+function findEgg(el){
+  const i=+el.dataset.egg;
+  if(state.eggs.day!==todayKey()) state.eggs={day:todayKey(),got:[]};
+  if(state.eggs.got.includes(i)) return;
+  state.eggs.got.push(i); state.money+=3; save(); renderMoney(true); coinSnd(); sparkleSnd();
+  el.innerHTML=`<svg viewBox="0 0 30 38">${star(15,19,13,'#ffd84d')}</svg>`; setTimeout(()=>el.remove(),600);
+  setCityHint(state.eggs.got.length>=EGG_POS.length ? t('eggsAll') : t('eggFound'));
+  if(state.eggs.got.length>=EGG_POS.length) confetti();
+}
+function carouselSvg(){
+  const horse=(x,c,d)=>`<svg x="${x}" y="22" width="16" height="22" viewBox="0 0 16 22"><g class="carHorse" style="animation-delay:${d}s"><rect x="7" y="0" width="1.4" height="22" fill="#ffd84d"/><ellipse cx="8" cy="13" rx="6" ry="3.5" fill="${c}"/><circle cx="13" cy="9" r="2.6" fill="${c}"/><path d="M4,15 v4 M12,15 v4" stroke="${c}" stroke-width="1.6"/></g></svg>`;
+  return `<svg viewBox="0 0 80 60"><ellipse cx="40" cy="56" rx="36" ry="4" fill="#ff9fd2"/><rect x="38" y="12" width="4" height="44" fill="#ffd84d"/>
+    ${horse(10,'#fff',0)}${horse(32,'#ffd6ec',.4)}${horse(54,'#d9c6ff',.8)}
+    <path d="M2,22 L40,2 L78,22Z" fill="#ff7ac0"/><path d="M2,22 L40,2 L21,22Z M59,22 L40,2 L78,22Z" fill="#fff" opacity=".55"/><rect x="2" y="20" width="76" height="4" rx="2" fill="#ffd84d"/>${star(40,3,4,'#ffd84d')}</svg>`;
+}
+
+/* --- Gebäude --- */
+function doenerSvg(){
+  return `<svg viewBox="0 0 200 170"><ellipse cx="100" cy="164" rx="92" ry="6" fill="#6a2d8f" opacity=".15"/>
+    <rect x="24" y="48" width="152" height="114" rx="10" fill="#ffe1c4"/>
+    ${Array.from({length:8},(_,i)=>`<rect x="${24+i*19}" y="40" width="19" height="18" fill="${i%2?'#fff':'#ff7a5c'}"/><circle cx="${33.5+i*19}" cy="58" r="9.5" fill="${i%2?'#fff':'#ff7a5c'}"/>`).join('')}
+    <rect x="56" y="6" width="88" height="30" rx="12" fill="#fff"/><text x="100" y="28" text-anchor="middle" font-size="19" font-weight="900" font-family="Arial,sans-serif" fill="#ff7a5c">DÖNER</text>
+    <rect x="34" y="78" width="80" height="56" rx="8" fill="#fff8c0"/><rect x="72" y="80" width="4" height="52" fill="#9a9aaa"/>
+    <path d="M60,86 L88,86 L82,128 L66,128Z" fill="#c9773a"/><path d="M62,96 H86 M64,108 H85 M66,120 H83" stroke="#e8a060" stroke-width="3"/>
+    <rect x="128" y="88" width="38" height="74" rx="16" fill="#ff7a5c"/><circle cx="158" cy="128" r="3.5" fill="#fff"/>
+    <rect x="30" y="136" width="90" height="10" rx="5" fill="#ff9fd2"/>${heart(150,112,1.2,'#fff')}${star(30,30,7,'#ffd84d')}</svg>`;
+}
+function cafeSvg(){
+  return `<svg viewBox="0 0 200 170"><ellipse cx="100" cy="164" rx="92" ry="6" fill="#6a2d8f" opacity=".15"/>
+    <rect x="24" y="48" width="152" height="114" rx="10" fill="#d4f7e6"/>
+    ${Array.from({length:8},(_,i)=>`<rect x="${24+i*19}" y="40" width="19" height="18" fill="${i%2?'#fff':'#ff9fd2'}"/><circle cx="${33.5+i*19}" cy="58" r="9.5" fill="${i%2?'#fff':'#ff9fd2'}"/>`).join('')}
+    <rect x="56" y="6" width="88" height="30" rx="12" fill="#fff"/><text x="100" y="28" text-anchor="middle" font-size="19" font-weight="900" font-family="Arial,sans-serif" fill="#3fbf8f">CAFÉ</text>
+    <rect x="34" y="80" width="78" height="54" rx="8" fill="#fff8c0"/><path d="M58,100 h26 v14 a13,13 0 0 1 -26,0Z" fill="#ff9fd2"/><path d="M84,104 q10,0 10,8 q0,8 -10,8" stroke="#ff9fd2" stroke-width="4" fill="none"/>
+    <path d="M64,94 q4,-6 0,-12 M72,94 q4,-6 0,-12 M80,94 q4,-6 0,-12" stroke="#fff" stroke-width="2.5" fill="none"/>
+    <rect x="126" y="88" width="40" height="74" rx="16" fill="#9b5cff"/><circle cx="158" cy="128" r="3.5" fill="#fff"/>${star(170,30,7,'#ffd84d')}</svg>`;
+}
+function marketSvg(){
+  const stall=(x,c)=>`<rect x="${x}" y="70" width="56" height="46" rx="4" fill="#c9773a"/><rect x="${x+4}" y="76" width="48" height="22" fill="#fff8c0"/>
+    <polygon points="${x-6},72 ${x+62},72 ${x+54},52 ${x+2},52" fill="${c}"/><path d="M${x+12},52 L${x+8},72 M${x+28},52 V72 M${x+44},52 L${x+48},72" stroke="#fff" stroke-width="5"/>
+    <path d="M${x-4},70 h64" stroke="#fff" stroke-width="5"/>${[0,1,2,3,4,5].map(i=>`<circle cx="${x+i*11}" cy="54" r="2.5" fill="${['#ffd84d','#7ad7ff','#ff9fd2'][i%3]}"/>`).join('')}`;
+  return `<svg viewBox="0 0 260 120"><ellipse cx="130" cy="116" rx="124" ry="5" fill="#6a2d8f" opacity=".15"/>
+    ${stall(6,'#ff4f6d')}${stall(198,'#ff4f6d')}
+    <rect x="124" y="98" width="12" height="18" fill="#8a5a3a"/>
+    <polygon points="130,4 96,46 112,46 84,78 104,78 74,104 186,104 156,78 176,78 148,46 164,46" fill="#3fbf8f"/>
+    ${[[118,40,'#ff4f6d'],[142,58,'#ffd84d'],[108,70,'#7ad7ff'],[150,86,'#ff9fd2'],[96,92,'#ffd84d'],[128,82,'#ff4f6d'],[160,98,'#7ad7ff']].map(([x,y,c])=>`<circle cx="${x}" cy="${y}" r="5" fill="${c}"/>`).join('')}
+    <path d="M100,46 Q130,56 160,46 M90,78 Q130,90 170,78" stroke="#ffd84d" stroke-width="2" fill="none" stroke-dasharray="2 4"/>${star(130,6,12,'#ffd84d')}</svg>`;
+}
+function xtreeSvg(){ return `<svg viewBox="0 0 60 90"><rect x="26" y="74" width="8" height="10" fill="#8a5a3a"/><rect x="16" y="82" width="28" height="8" rx="3" fill="#ff4f6d"/>
+  <polygon points="30,8 10,40 20,40 6,72 54,72 40,40 50,40" fill="#3fbf8f"/>${[[24,34,'#ff4f6d'],[36,50,'#ffd84d'],[20,60,'#7ad7ff'],[40,64,'#ff9fd2']].map(([x,y,c])=>`<circle cx="${x}" cy="${y}" r="3.5" fill="${c}"/>`).join('')}${star(30,9,7,'#ffd84d')}</svg>`; }
+function xstarSvg(){ return `<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="#fff6b0" opacity=".4"/>${star(30,30,24,'#ffd84d','stroke="#fff" stroke-width="3"')}${star(30,32,9,'#fff8c0')}</svg>`; }
+function giftsSvg(){ const box=(x,y,w,h,c,r)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${c}"/><rect x="${x+w/2-3}" y="${y}" width="6" height="${h}" fill="${r}"/><path d="M${x+w/2},${y} q-10,-10 -12,-2 q4,4 12,2 q10,-10 12,-2 q-4,4 -12,2" fill="${r}"/>`;
+  return `<svg viewBox="0 0 100 70">${box(6,30,38,36,'#ff7ac0','#ffd84d')}${box(48,20,46,46,'#9b5cff','#fff')}${box(30,44,26,22,'#7ad7ff','#ff4f6d')}</svg>`; }
+
+/* --- Imbiss: Döner, Café, Weihnachtsmarkt --- */
+const SNACKS={
+  doener:{p:6,n:{de:'Döner',ru:'Донер',ro:'Döner'},svg:()=>`<svg viewBox="0 0 60 60"><path d="M10,14 Q30,4 50,14 L36,56 Q30,60 24,56Z" fill="#f5d49a"/><path d="M14,16 Q30,10 46,16 L42,28 Q30,24 18,28Z" fill="#7ed957"/><circle cx="24" cy="24" r="4" fill="#ff4f6d"/><circle cx="36" cy="22" r="4" fill="#ff4f6d"/><path d="M18,30 Q30,26 42,30 L38,40 Q30,37 22,40Z" fill="#c9773a"/><path d="M24,44 L36,44 L34,52 L26,52Z" fill="#fff" opacity=".8"/></svg>`},
+  fries:{p:4,n:{de:'Pommes',ru:'Картошка фри',ro:'Cartofi prăjiți'},svg:()=>`<svg viewBox="0 0 60 60"><g fill="#ffd84d">${[16,22,28,34,40].map((x,i)=>`<rect x="${x}" y="${6+i%2*4}" width="5" height="30" rx="2"/>`).join('')}</g><path d="M12,24 L48,24 L42,56 L18,56Z" fill="#ff4f6d"/>${heart(30,40,1.2,'#fff')}</svg>`},
+  cocoa:{p:3,drink:1,n:{de:'Kakao',ru:'Какао',ro:'Cacao'},svg:()=>`<svg viewBox="0 0 60 60"><path d="M12,20 h30 v22 a12,12 0 0 1 -12,12 h-6 a12,12 0 0 1 -12,-12Z" fill="#ff9fd2"/><path d="M42,26 q10,0 10,8 q0,8 -10,8" stroke="#ff9fd2" stroke-width="4" fill="none"/><ellipse cx="27" cy="20" rx="15" ry="4" fill="#8a5a3a"/><circle cx="22" cy="18" r="3.5" fill="#fff"/><circle cx="31" cy="17" r="3.5" fill="#fff"/>${heart(27,38,1,'#fff')}</svg>`},
+  cake:{p:4,n:{de:'Kuchen',ru:'Кусочек торта',ro:'Prăjitură'},svg:()=>`<svg viewBox="0 0 60 60"><path d="M8,30 L52,22 L52,50 L8,54Z" fill="#ffe1c4"/><path d="M8,30 L52,22 L52,30 L8,38Z" fill="#ff9fd2"/><path d="M8,44 L52,38 L52,42 L8,48Z" fill="#ff9fd2"/><circle cx="40" cy="18" r="6" fill="#ff4f6d"/><path d="M40,12 q2,-4 5,-4" stroke="#3fbf8f" stroke-width="2" fill="none"/></svg>`},
+  ice:{p:3,n:{de:'Eis',ru:'Мороженое',ro:'Înghețată'},svg:()=>`<svg viewBox="0 0 60 60"><path d="M18,30 L42,30 L30,58Z" fill="#f5c27a"/><path d="M22,34 L38,34 M24,40 L36,40" stroke="#d99a4e" stroke-width="2"/><circle cx="30" cy="22" r="13" fill="#ff9fd2"/><circle cx="22" cy="18" r="8" fill="#9ff0cf"/>${[[26,14,'#ffd84d'],[34,20,'#7ad7ff'],[30,26,'#fff'],[20,22,'#ff4f6d']].map(([x,y,c])=>`<rect x="${x}" y="${y}" width="3" height="1.5" rx=".7" fill="${c}"/>`).join('')}</svg>`},
+  punch:{p:3,drink:1,n:{de:'Kinderpunsch',ru:'Детский пунш',ro:'Punci pentru copii'},svg:()=>`<svg viewBox="0 0 60 60"><path d="M12,20 h30 v22 a12,12 0 0 1 -12,12 h-6 a12,12 0 0 1 -12,-12Z" fill="#c9a7ff"/><path d="M42,26 q10,0 10,8 q0,8 -10,8" stroke="#c9a7ff" stroke-width="4" fill="none"/><ellipse cx="27" cy="20" rx="15" ry="4" fill="#ff4f6d"/><circle cx="36" cy="18" r="5" fill="#ffb347"/><path d="M20,12 q3,-5 0,-10 M28,12 q3,-5 0,-10" stroke="#c9a7ff" stroke-width="2" fill="none"/>${star(27,38,6,'#ff4f6d')}</svg>`},
+  ginger:{p:3,n:{de:'Lebkuchenherz',ru:'Пряничное сердце',ro:'Inimă de turtă dulce'},svg:()=>`<svg viewBox="0 0 60 60"><path transform="translate(30 32) scale(3.2)" d="M0,6 C-8,0 -9,-6 -5,-8 C-2,-9 0,-7 0,-5 C0,-7 2,-9 5,-8 C9,-6 8,0 0,6Z" fill="#c9773a"/><path transform="translate(30 32) scale(2.6)" d="M0,6 C-8,0 -9,-6 -5,-8 C-2,-9 0,-7 0,-5 C0,-7 2,-9 5,-8 C9,-6 8,0 0,6Z" fill="none" stroke="#fff" stroke-width=".6" stroke-dasharray="1 1"/><path d="M8,10 Q30,2 52,10" stroke="#ff4f6d" stroke-width="2" fill="none"/></svg>`},
+  advent:{p:25,n:NAMES.advent,svg:()=>calendarSvg()}
+};
+const SNACK_MENU={doener:['doener','fries'], cafe:['cocoa','cake','ice'], market:['punch','ginger','advent']};
+let snackId='doener', snackBusy=false, SN={av:null,pet:null};
+function goSnack(id){
+  snackId=id; snackBusy=false;
+  $('snackTitle').textContent=t(id);
+  const sc=$('snackScene');
+  const bg = id==='doener'?'#ffe1c4' : id==='cafe'?'#d4f7e6' : '#e9f0ff';
+  sc.style.background=`linear-gradient(180deg,${bg} 0 62%,#f7b3d4 62% 100%)`;
+  sc.innerHTML=`<div class="snackCounter">${PLACES[id].svg()}</div>`+(id==='market'&&season()==='xmas'?'<div class="flakeBox">'+Array.from({length:14},(_,i)=>`<div class="flake" style="left:${i*7}%;animation-delay:${i*.4}s;animation-duration:${5+i%4}s"></div>`).join('')+'</div>':'');
+  SN.av=mkEntIn(sc,person(AVATARS[state.avatar].o),20,false); SN.av.x=.3; SN.av.y=.06; renderEnt(SN.av);
+  SN.pet=null;
+  if(state.pet && state.petCity!==false){ SN.pet=mkEntIn(sc,petSvg(state.pet,state.wear),state.pet.type==='dog'?26:24,true); SN.pet.x=.68; SN.pet.y=.05; renderEnt(SN.pet); }
+  renderSnackMenu(); renderMoney(false);
+  show('s-snack'); chime();
+}
+function renderSnackMenu(){
+  $('snackMenu').innerHTML=SNACK_MENU[snackId].map(k=>{ const it=SNACKS[k], own = k==='advent' && adventActive();
+    return `<button class="scard" data-snack="${k}"><div class="sic">${it.svg()}</div><div class="snm">${it.n[lang]}</div><div class="spr">${COIN}${fmtMoney(it.p)}</div>${own?'<div class="own">✓</div>':''}</button>`; }).join('');
+}
+$('snackMenu').addEventListener('click',e=>{
+  const b=e.target.closest('[data-snack]'); if(!b || snackBusy) return;
+  const k=b.dataset.snack, it=SNACKS[k];
+  if(k==='advent'){ buyAdvent(); return; }
+  if(state.money<it.p){ toast(t('noMoney')); nope(); return; }
+  state.money-=it.p; save(); renderMoney(true); coinSnd();
+  eatSnack(k);
+});
+function eatSnack(k){
+  snackBusy=true;
+  const sc=$('snackScene'), it=SNACKS[k], av=SN.av;
+  const food=document.createElement('div'); food.className='snackFood'; food.innerHTML=it.svg();
+  const hF=av.el.offsetHeight/sc.offsetHeight;
+  food.style.left=(av.x*100+7)+'%'; food.style.bottom=((av.y+hF*.42)*100)+'%'; sc.appendChild(food);
+  av.el.classList.add('eating'); it.drink?lap():nom();
+  [500,1000,1500].forEach((ms,i)=>later(()=>{ food.style.transform=`translate(-50%,0) scale(${1-.28*(i+1)})`; },ms));
+  later(()=>{
+    food.remove(); av.el.classList.remove('eating');
+    if(SN.pet){
+      const tr=document.createElement('div'); tr.className='fx'; tr.style.left=(SN.pet.x*100)+'%'; tr.style.bottom=(SN.pet.y*100+30)+'%';
+      tr.innerHTML=(state.pet.type==='cat'?FISH_I:TREAT_I).replace('<svg','<svg style="width:40px"'); tr.style.setProperty('--up','-40px'); sc.appendChild(tr); setTimeout(()=>tr.remove(),1600);
+      SN.pet.el.classList.remove('hop'); void SN.pet.el.offsetWidth; SN.pet.el.classList.add('hop');
+      state.pet.type==='dog'?bark(DOGS[state.pet.i].p):meow(CATS[state.pet.i].p);
+    }
+    for(let i=0;i<3;i++){ const h=document.createElement('div'); h.className='fx'; h.style.left=(30+i*14)+'%'; h.style.bottom='55%'; h.innerHTML=heartSvg(true).replace('<svg','<svg style="width:28px"'); h.style.setProperty('--up','90px'); sc.appendChild(h); setTimeout(()=>h.remove(),1800); }
+    state.happy=Math.min(100,state.happy+5); save(); chime();
+    toast(tn('snackYum')); snackBusy=false;
+  },2000);
+}
+$('snackBack').addEventListener('click',()=>{ pop(); goCity(snackId); });
+
+/* --- Adventskalender --- */
+const adventActive=()=>state.advent.bought && state.advent.year===adventYear();
+function adventYear(){ const d=new Date(); return d.getMonth()===0 ? d.getFullYear()-1 : d.getFullYear(); }
+function buyAdvent(){
+  if(adventActive()){ toast(t('calHave')); pop(); return; }
+  const it=SNACKS.advent;
+  if(state.money<it.p){ toast(t('noMoney')); nope(); return; }
+  state.money-=it.p; state.advent={year:adventYear(),bought:true,opened:[]}; save(); renderMoney(true); kaching(); confetti();
+  toast(t('calBought')); renderSnackMenu();
+}
+function calendarSvg(){
+  const op=state.advent.opened||[];
+  let doors='';
+  for(let n=1;n<=24;n++){ const c=(n-1)%6, r=Math.floor((n-1)/6), x=8+c*14, y=26+r*16, o=op.includes(n);
+    doors+=`<rect x="${x}" y="${y}" width="12" height="13" rx="2" fill="${o?'#fff6b0':['#ff7ac0','#9b5cff','#3fbf8f','#7ad7ff'][(n+r)%4]}"/>`+
+      (o?star(x+6,y+6.5,4,'#ffd84d'):`<text x="${x+6}" y="${y+9.5}" text-anchor="middle" font-size="7" font-weight="900" font-family="Arial,sans-serif" fill="#fff">${n}</text>`); }
+  return `<svg viewBox="0 0 100 92"><rect x="2" y="14" width="96" height="76" rx="8" fill="#ff4f6d"/><rect x="2" y="14" width="96" height="8" rx="4" fill="#3fbf8f"/>
+    <path d="M50,14 q-14,-14 -18,-6 q6,6 18,6 q14,-14 18,-6 q-6,6 -18,6" fill="#ffd84d"/>${doors}</svg>`;
+}
+const ADVENT_PRIZES=[null,'coins','treat','glitter','xhat_c','coins','treat','xtree_c','glitter','coins','scarf_c','treat','coins','glitter','xstar_c','treat','coins','antlers_c','glitter','coins','treat','coins','glitter','treat','big'];
+function openCalendar(){
+  const now=new Date(), dec=now.getMonth()===11, today=now.getDate(), op=state.advent.opened;
+  let cells='';
+  for(let n=1;n<=24;n++){
+    const o=op.includes(n), can=dec && n===today && !o;
+    cells+=`<button class="calDoor${o?' open':''}${can?' today':''}" data-door="${n}">${o?prizeIcon(n):n}</button>`;
+  }
+  const msg = !dec||today>24 ? t('calNotDec') : op.includes(today) ? t('calDone') : t('calToday').replace('{d}',today);
+  openSheet(`<div class="bagHead">${t('calTitle')}</div><div class="mq small">${msg}</div><div class="calGrid">${cells}</div>
+    <div class="row" style="margin-top:2vmin"><button class="pill ghost" data-close>${t('back')}</button></div>`);
+}
+function prizeIcon(n){
+  const p=ADVENT_PRIZES[n];
+  if(p==='coins') return `<span class="pi">${COIN}</span>`;
+  if(p==='treat') return `<span class="pi">${TREAT_I}</span>`;
+  if(p==='glitter') return `<span class="pi"><svg viewBox="0 0 20 20">${star(10,10,9,'#ffd84d')}</svg></span>`;
+  if(p==='big') return `<span class="pi">${giftsSvg()}</span>`;
+  return `<span class="pi">${CATALOG[p].svg()}</span>`;
+}
+function openAdventDoor(n){
+  const now=new Date();
+  if(now.getMonth()!==11 || now.getDate()>24){ toast(t('calNotDec')); nope(); return; }
+  if(state.advent.opened.includes(n)) return;
+  if(n>now.getDate()){ toast(t('calWait').replace('{d}',n)); nope(); return; }
+  if(n<now.getDate()){ toast(t('calPast')); nope(); return; }
+  state.advent.opened.push(n);
+  const p=ADVENT_PRIZES[n]; let msg='';
+  if(p==='coins'){ state.money+=20; msg=t('prizeCoins')+' +'+fmtMoney(20); coinSnd(); }
+  else if(p==='treat'){ state.cons.treat=(state.cons.treat||0)+2; msg=t('prizeTreat'); }
+  else if(p==='glitter'){ msg=t('prizeGlitter'); state.happy=Math.min(100,state.happy+10); }
+  else if(p==='big'){ state.money+=100; if(!state.items.some(i=>i.id==='gifts_c')) state.items.push({u:state.nextU++,id:'gifts_c',x:null,y:null}); msg=t('prizeBig')+' +'+fmtMoney(100); }
+  else if(CATALOG[p].t==='wear'){ if(!state.clothes.includes(p)) state.clothes.push(p); msg=t('prizeItem').replace('{item}',itemName(p)); }
+  else { state.items.push({u:state.nextU++,id:p,x:null,y:null}); msg=t('prizeItem').replace('{item}',itemName(p)); }
+  save(); renderMoney(true); if(current==='s-home'){ updateBagBadge(); renderHearts(true); const c=document.querySelector('.calItem'); if(c) c.innerHTML=calendarSvg(); }
+  tada(); confetti(); if(p==='glitter'||p==='big') for(let i=0;i<3;i++) setTimeout(confetti,i*500);
+  closeSheet(); toast(msg);
+}
+$('sheet2').addEventListener('click',e=>{ const d=e.target.closest('[data-door]'); if(d) openAdventDoor(+d.dataset.door); });
+$('snackBack').innerHTML=BACK_ICON;
 
 /* ----- общие кнопки ----- */
 document.querySelectorAll('[data-back]').forEach(b=>{
